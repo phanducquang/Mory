@@ -1,0 +1,16 @@
+node_modules
+src/server/db/generated
+.next
+.deploy
+.git
+.idea
+.aws
+.codex
+.agents
+.env
+.env.*
+!.env.example
+coverage
+playwright-report
+test-results
+npm-debug.log*

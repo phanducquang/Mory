@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#7962AB" />
+    <title>Bạn đang ngoại tuyến · Mory</title>
+    <style>
+      *{box-sizing:border-box}body{margin:0;background:#faf9f6;color:#333c32;font:16px/1.7 system-ui,sans-serif;min-height:100svh;display:grid;place-items:center;padding:28px}main{max-width:420px;text-align:center}img{width:76px;height:76px;border-radius:22px}h1{font-size:28px;line-height:1.35;margin:28px 0 12px;letter-spacing:-.04em}p{color:#70796b}button{font:inherit;background:#7962ab;color:white;border:0;border-radius:14px;padding:12px 24px;margin:16px 0;cursor:pointer}button:focus-visible{outline:3px solid #bd8f72;outline-offset:4px}small{display:block;color:#70796b}
+    </style>
+  </head>
+  <body><main>
+    <img src="/icons/icon-192.png" alt="Mory" />
+    <h1>Mình kết nối lại nhé.</h1>
+    <p>Mory cần kết nối mạng để mở trang này. Những kỷ niệm đã lưu trong trình duyệt vẫn ở trên thiết bị này.</p>
+    <button id="retry" type="button">Thử kết nối lại</button>
+    <small>Mory chỉ lưu tài nguyên giao diện trong bộ nhớ đệm ngoại tuyến, không lưu trang chứa thông tin gia đình.</small>
+  </main><script>document.getElementById('retry').addEventListener('click',function(){location.reload()});</script></body>
+</html>

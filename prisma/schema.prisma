@@ -1,0 +1,422 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/server/db/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum FamilyRole {
+  OWNER
+  PARENT
+  VIEWER
+}
+
+enum ChildLifecycle {
+  EXPECTING
+  AFTER_BIRTH
+  PAUSED
+  ENDED
+}
+
+enum Gender {
+  female
+  male
+  other
+  unspecified
+}
+
+enum CalendarRule {
+  SAME_DAY
+  MINUS_ONE
+  MINUS_TWO
+}
+
+enum LeapMonthRule {
+  REGULAR_MONTH
+  LEAP_MONTH
+  NEXT_AVAILABLE
+}
+
+enum EventType {
+  memory
+  milestone
+  health
+  activity
+}
+
+enum MilestoneKind {
+  due
+  full_month     @map("full-month")
+  first_birthday @map("first-birthday")
+  birthday
+  development
+  custom
+}
+
+enum MilestoneState {
+  SUGGESTED
+  PENDING_CONFIRMATION
+  CONFIRMED
+  COMPLETED
+  SKIPPED
+}
+
+enum MediaStatus {
+  PENDING_VERIFICATION
+  READY
+  REJECTED
+}
+
+enum MediaPurpose {
+  EVENT
+  AVATAR
+}
+
+model User {
+  id                  String             @id @default(uuid()) @db.Uuid
+  displayName         String             @db.VarChar(120)
+  email               String?            @unique @db.VarChar(320)
+  createdAt           DateTime           @default(now()) @db.Timestamptz(3)
+  memberships         FamilyMember[]
+  preference          UserPreference?
+  emailVerified       Boolean            @default(false)
+  image               String?
+  updatedAt           DateTime           @default(now()) @updatedAt @db.Timestamptz(3)
+  sessions            AuthSession[]
+  accounts            AuthAccount[]
+  deletionRequestedAt DateTime?          @db.Timestamptz(3)
+  mediaBudget         MediaUploadBudget?
+}
+
+model AuthSession {
+  id        String   @id @default(uuid()) @db.Uuid
+  token     String   @unique
+  userId    String   @db.Uuid
+  expiresAt DateTime @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  ipAddress String?
+  userAgent String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AuthAccount {
+  id                    String    @id @default(uuid()) @db.Uuid
+  accountId             String
+  providerId            String
+  userId                String    @db.Uuid
+  password              String?
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
+  scope                 String?
+  createdAt             DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @db.Timestamptz(3)
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model AuthVerification {
+  id         String   @id @default(uuid()) @db.Uuid
+  identifier String
+  value      String
+  expiresAt  DateTime @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([identifier])
+}
+
+model AuthRateLimit {
+  id          String @id @default(uuid()) @db.Uuid
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+}
+
+model Family {
+  deletionRequestedAt DateTime?      @db.Timestamptz(3)
+  auditLogs           AuditLog[]
+  id                  String         @id @default(uuid()) @db.Uuid
+  name                String         @db.VarChar(120)
+  createdAt           DateTime       @default(now()) @db.Timestamptz(3)
+  members             FamilyMember[]
+  children            Child[]
+}
+
+model FamilyMember {
+  familyId String     @db.Uuid
+  userId   String     @db.Uuid
+  role     FamilyRole
+  family   Family     @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  mailJobs AuthMailJob[]
+
+  @@id([familyId, userId])
+  @@index([userId])
+}
+
+model Child {
+  id                      String           @id @default(uuid()) @db.Uuid
+  familyId                String           @db.Uuid
+  name                    String           @db.VarChar(80)
+  nickname                String?          @db.VarChar(40)
+  lifecycle               ChildLifecycle
+  dueDate                 DateTime?        @db.Date
+  birthDate               DateTime?        @db.Date
+  birthTime               String?          @db.VarChar(5)
+  gender                  Gender?
+  calendarRule            CalendarRule     @default(SAME_DAY)
+  leapMonthRule           LeapMonthRule    @default(REGULAR_MONTH)
+  reminderEnabled         Boolean          @default(true)
+  trackingUntilAge        Int              @default(18)
+  dueReminderSnoozedUntil DateTime?        @db.Date
+  createdAt               DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt               DateTime         @updatedAt @db.Timestamptz(3)
+  family                  Family           @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  events                  Event[]
+  milestones              ChildMilestone[]
+  entries                 JourneyEntry[]
+  reminders               Reminder[]
+  avatarAssetId           String?          @unique @db.Uuid
+  avatarAsset             MediaAsset?      @relation("SelectedAvatar", fields: [familyId, id, avatarAssetId], references: [familyId, childId, id], onDelete: NoAction, onUpdate: NoAction)
+  mediaAssets             MediaAsset[]     @relation("ChildMedia")
+
+  @@unique([familyId, id])
+  @@unique([familyId, id, avatarAssetId])
+  @@index([familyId, createdAt, id])
+}
+
+model Event {
+  id          String          @id @default(uuid()) @db.Uuid
+  familyId    String          @db.Uuid
+  childId     String          @db.Uuid
+  title       String          @db.VarChar(120)
+  date        DateTime        @db.Date
+  time        String          @default("") @db.VarChar(5)
+  type        EventType
+  description String          @default("")
+  reminder    Boolean         @default(false)
+  createdAt   DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime        @updatedAt @db.Timestamptz(3)
+  child       Child           @relation(fields: [familyId, childId], references: [familyId, id], onDelete: Cascade, onUpdate: NoAction)
+  milestone   ChildMilestone?
+  media       MediaAsset[]
+  reminders   Reminder[]
+  entries     JourneyEntry[]
+
+  @@unique([familyId, childId, id])
+  @@index([reminder, date, id])
+  @@index([familyId, childId, date(sort: Desc), time(sort: Desc), id(sort: Desc)])
+}
+
+model MilestoneDefinition {
+  key       String           @id @db.VarChar(120)
+  title     String           @db.VarChar(120)
+  kind      MilestoneKind
+  calendar  String           @db.VarChar(24)
+  instances ChildMilestone[]
+}
+
+model ChildMilestone {
+  id                    String               @id @db.VarChar(200)
+  familyId              String               @db.Uuid
+  childId               String               @db.Uuid
+  key                   String               @db.VarChar(160)
+  definitionKey         String?              @db.VarChar(120)
+  eventId               String?              @db.Uuid
+  title                 String               @db.VarChar(120)
+  kind                  MilestoneKind
+  state                 MilestoneState
+  suggestedDate         DateTime?            @db.Date
+  confirmedDate         DateTime?            @db.Date
+  ceremonyDate          DateTime?            @db.Date
+  needsDateConfirmation Boolean              @default(true)
+  description           String               @default("")
+  age                   Int?
+  createdAt             DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime             @updatedAt @db.Timestamptz(3)
+  child                 Child                @relation(fields: [familyId, childId], references: [familyId, id], onDelete: Cascade, onUpdate: NoAction)
+  definition            MilestoneDefinition? @relation(fields: [definitionKey], references: [key], onDelete: SetNull)
+  event                 Event?               @relation(fields: [familyId, childId, eventId], references: [familyId, childId, id], onDelete: NoAction, onUpdate: NoAction)
+  reminders             Reminder[]
+
+  @@unique([familyId, childId, key])
+  @@unique([familyId, childId, eventId])
+  @@unique([familyId, childId, id])
+}
+
+model JourneyEntry {
+  id        String   @id @default(uuid()) @db.Uuid
+  familyId  String   @db.Uuid
+  childId   String   @db.Uuid
+  eventId   String?  @db.Uuid
+  body      String
+  date      DateTime @db.Date
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  child     Child    @relation(fields: [familyId, childId], references: [familyId, id], onDelete: Cascade, onUpdate: NoAction)
+  event     Event?   @relation(fields: [familyId, childId, eventId], references: [familyId, childId, id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([familyId, childId, date])
+}
+
+model MediaAsset {
+  id          String       @id @default(uuid()) @db.Uuid
+  familyId    String       @db.Uuid
+  childId     String       @db.Uuid
+  eventId     String?      @db.Uuid
+  purpose     MediaPurpose @default(EVENT)
+  objectKey   String       @unique @db.VarChar(1024)
+  contentType String       @db.VarChar(64)
+  byteLength  Int
+  status      MediaStatus  @default(PENDING_VERIFICATION)
+  width       Int?
+  height      Int?
+  createdAt   DateTime     @default(now()) @db.Timestamptz(3)
+  expiresAt   DateTime     @default(dbgenerated("(now() + '00:05:00'::interval)")) @db.Timestamptz(3)
+  event       Event?       @relation(fields: [familyId, childId, eventId], references: [familyId, childId, id], onDelete: Cascade, onUpdate: NoAction)
+  child       Child        @relation("ChildMedia", fields: [familyId, childId], references: [familyId, id], onDelete: Cascade, onUpdate: NoAction)
+  avatarFor   Child?       @relation("SelectedAvatar")
+
+  @@unique([familyId, childId, id])
+  @@index([familyId, eventId, status])
+  @@index([familyId, childId, purpose, status])
+  @@index([status, expiresAt])
+}
+
+model Reminder {
+  id          String          @id @default(uuid()) @db.Uuid
+  familyId    String          @db.Uuid
+  childId     String          @db.Uuid
+  eventId     String?         @db.Uuid
+  milestoneId String?         @db.VarChar(200)
+  scheduledAt DateTime        @db.Timestamptz(3)
+  enabled     Boolean         @default(true)
+  child       Child           @relation(fields: [familyId, childId], references: [familyId, id], onDelete: Cascade, onUpdate: NoAction)
+  event       Event?          @relation(fields: [familyId, childId, eventId], references: [familyId, childId, id], onDelete: NoAction, onUpdate: NoAction)
+  milestone   ChildMilestone? @relation(fields: [familyId, childId, milestoneId], references: [familyId, childId, id], onDelete: NoAction, onUpdate: NoAction)
+
+  mailJobs AuthMailJob[]
+
+  @@unique([familyId, id])
+  @@unique([familyId, eventId, scheduledAt])
+  @@index([familyId, childId])
+  @@index([enabled, scheduledAt])
+}
+
+model MediaCleanupJob {
+  id          String    @id @default(uuid()) @db.Uuid
+  familyId    String    @db.Uuid
+  objectKey   String    @db.VarChar(1024)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  completedAt DateTime? @db.Timestamptz(3)
+  notBefore   DateTime  @default(now()) @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  leaseUntil  DateTime? @db.Timestamptz(3)
+  leaseToken  String?   @db.Uuid
+
+  @@index([completedAt, createdAt])
+  @@index([completedAt, notBefore, leaseUntil])
+}
+
+model MediaUploadBudget {
+  userId    String   @id @db.Uuid
+  count     Int      @default(0)
+  startedAt DateTime @default(now()) @db.Timestamptz(3)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model MediaMaintenanceState {
+  leaseUntil DateTime? @db.Timestamptz(3)
+  leaseToken String?   @db.Uuid
+  key        String    @id @db.VarChar(100)
+  cursor     String?
+  updatedAt  DateTime  @updatedAt @db.Timestamptz(3)
+}
+
+model UserPreference {
+  userId               String  @id @db.Uuid
+  locale               String  @default("vi-VN") @db.VarChar(16)
+  timezone             String  @default("Asia/Ho_Chi_Minh") @db.VarChar(64)
+  notificationsEnabled Boolean @default(false)
+  user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Encrypted, short-lived email payloads. No FK to an uncommitted auth transaction.
+model AuthMailJob {
+  id          String    @id @default(uuid()) @db.Uuid
+  purpose     String    @db.VarChar(16)
+  payload     String?
+  status      String    @default("QUEUED") @db.VarChar(16)
+  expiresAt   DateTime  @db.Timestamptz(3)
+  notBefore   DateTime  @default(now()) @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  leaseToken  String?   @db.Uuid
+  leaseUntil  DateTime? @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  completedAt DateTime? @db.Timestamptz(3)
+
+  familyId        String?       @db.Uuid
+  recipientUserId String?       @db.Uuid
+  reminderId      String?       @db.Uuid
+  subjectUserId   String?       @db.Uuid
+  verificationHash String? @unique @db.VarChar(64)
+  recipient       FamilyMember? @relation(fields: [familyId, recipientUserId], references: [familyId, userId], onDelete: Cascade, onUpdate: NoAction)
+  reminder        Reminder?     @relation(fields: [familyId, reminderId], references: [familyId, id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([reminderId, recipientUserId])
+  @@index([subjectUserId])
+  @@index([familyId, recipientUserId])
+  @@index([familyId, reminderId])
+  @@index([status, notBefore, leaseUntil])
+}
+
+model AuthMailBudget {
+  key          String    @id @db.VarChar(100)
+  count        Int       @default(0)
+  startedAt    DateTime  @default(now()) @db.Timestamptz(3)
+  lastQueuedAt DateTime? @db.Timestamptz(3)
+}
+
+model WorkerCheckpoint {
+  key        String    @id @db.VarChar(100)
+  cursor     String?
+  leaseToken String?   @db.Uuid
+  leaseUntil DateTime? @db.Timestamptz(3)
+  updatedAt  DateTime  @updatedAt @db.Timestamptz(3)
+}
+
+model AuditLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  familyId     String   @db.Uuid
+  actorId      String?  @db.Uuid
+  resourceKind String   @db.VarChar(32)
+  resourceId   String   @db.VarChar(200)
+  action       String   @db.VarChar(32)
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  family       Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@index([familyId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([actorId])
+  @@index([createdAt])
+}
+
+model DeletionTombstone {
+  id          String    @id @default(uuid()) @db.Uuid
+  kind        String    @db.VarChar(16)
+  resourceId  String    @db.Uuid
+  requestedAt DateTime  @default(now()) @db.Timestamptz(3)
+  completedAt DateTime? @db.Timestamptz(3)
+
+  @@unique([kind, resourceId])
+  @@index([completedAt, requestedAt])
+}

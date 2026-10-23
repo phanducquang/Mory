@@ -1,0 +1,31 @@
+# Optional local infrastructure. Account/media modes require explicit configuration.
+services:
+  postgres:
+    image: postgres:17-alpine
+    profiles: [services]
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mory}
+      POSTGRES_DB: ${POSTGRES_DB:-mory}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a local POSTGRES_PASSWORD}
+    volumes:
+      - mory-postgres:/var/lib/postgresql/data
+  minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    profiles: [services]
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Set a local MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set a local MINIO_ROOT_PASSWORD}
+    volumes:
+      - mory-minio:/data
+
+volumes:
+  mory-postgres:
+  mory-minio:

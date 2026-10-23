@@ -25,8 +25,9 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
-.env
+.env*
+!.env.example
+/.deploy/
 
 # vercel
 .vercel
@@ -34,3 +35,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# browser test artifacts
+/test-results/
+/playwright-report/
+
+# Generated Prisma client (npm run db:generate)
+/src/server/db/generated/
+
+/docs/
