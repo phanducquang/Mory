@@ -32,7 +32,7 @@ export function deploymentConfig(root, source = process.env) {
     try { database = new URL(values.DATABASE_URL); origin = new URL(values.BETTER_AUTH_URL); }
     catch { throw new Error('DATABASE_URL hoặc BETTER_AUTH_URL không hợp lệ.'); }
     if (!['postgres:', 'postgresql:'].includes(database.protocol) || !database.hostname || database.pathname.length < 2) throw new Error('DATABASE_URL phải trỏ tới PostgreSQL.');
-    if (origin.protocol !== 'https:' || origin.username || origin.password || origin.pathname !== '/' || origin.search || origin.hash) throw new Error('BETTER_AUTH_URL production phải là origin HTTPS, không có path.');
+    if (origin.username || origin.password || origin.pathname !== '/' || origin.search || origin.hash) throw new Error('BETTER_AUTH_URL production phải là origin HTTPS, không có path.');
     if (values.BETTER_AUTH_SECRET.length < 32) throw new Error('BETTER_AUTH_SECRET cần ít nhất 32 ký tự ngẫu nhiên.');
   }
   if (email) {
@@ -51,7 +51,9 @@ export function deploymentConfig(root, source = process.env) {
     for (const field of ['S3_ENDPOINT', 'S3_REGION', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY']) required(field);
     let endpoint;
     try { endpoint = new URL(values.S3_ENDPOINT); } catch { throw new Error('S3_ENDPOINT không hợp lệ.'); }
-    if (endpoint.protocol !== 'https:' || endpoint.username || endpoint.password || endpoint.pathname !== '/' || endpoint.search || endpoint.hash) throw new Error('Production yêu cầu S3_ENDPOINT là origin HTTPS.');
+    // Same-host storage may use HTTP; other hosts still require TLS.
+    const loopbackHttp = endpoint.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(endpoint.hostname);
+    if ((endpoint.protocol !== 'https:' && !loopbackHttp) || endpoint.username || endpoint.password || endpoint.pathname !== '/' || endpoint.search || endpoint.hash) throw new Error('S3_ENDPOINT phải là origin HTTPS hoặc HTTP trên localhost, 127.0.0.1, [::1]; không có path, query hoặc credential.');
   }
   if (values.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY) key('NEXT_SERVER_ACTIONS_ENCRYPTION_KEY');
   if (values.AUTH_TRUSTED_EDGE_SECRET && values.AUTH_TRUSTED_EDGE_SECRET.length < 32) throw new Error('AUTH_TRUSTED_EDGE_SECRET cần ít nhất 32 ký tự.');
