@@ -31,7 +31,6 @@ import {
 } from "lucide-react";
 import { useJourney } from "./journey-provider";
 import { useServerTimeline } from "./use-server-timeline";
-import { AccountSignOut } from "./server-journey-provider";
 import { exportFamilyData } from "@/app/actions/journey";
 import type { InitialTimelinePage } from "@/lib/validation/timeline-query";
 import {
@@ -78,7 +77,6 @@ const types: Record<
   activity: { label: "Hoạt động", icon: Camera, className: "peach" },
 };
 function PageHeading({
-  eyebrow,
   title,
   description,
   action,
@@ -91,7 +89,6 @@ function PageHeading({
   return (
     <div className="page-heading">
       <div>
-        <div className="eyebrow">{eyebrow}</div>
         <h1>{title}</h1>
         <p>{description}</p>
       </div>
@@ -144,7 +141,7 @@ function MemoryCard({ event }: { event: Event }) {
             loading="lazy"
           />
         ) : (
-          <div className="memory-illustration">
+          <div className="memory-illustration" aria-hidden="true">
             <span>✧</span>
             <typesPlaceholder.Icon />
             <span>✦</span>
@@ -309,7 +306,7 @@ export function HomeView() {
           <h2>
             Những điều nhỏ bé,
             <br />
-            thành ký ức <em>lớn lao.</em>
+            thành ký ức <span>lớn lao.</span>
           </h2>
           <p>
             {isExpecting
@@ -324,8 +321,8 @@ export function HomeView() {
           </span>
         </div>
         <div className="hero-art">
-          <span className="doodle-star star-one">✧</span>
-          <span className="doodle-star star-two">✦</span>
+          <span className="doodle-star star-one" aria-hidden="true">✧</span>
+          <span className="doodle-star star-two" aria-hidden="true">✦</span>
           <div className="polaroid">
             <span className="tape" />
             <Image
@@ -348,7 +345,7 @@ export function HomeView() {
             </div>
             <Heart size={15} />
           </div>
-          <span className="doodle-heart">♡</span>
+          <span className="doodle-heart" aria-hidden="true">♡</span>
         </div>
       </section>
       <div className="stats-grid">
@@ -363,7 +360,6 @@ export function HomeView() {
             </strong>
             <span>Những câu chuyện đã lưu</span>
           </div>
-          <span className="stat-decoration">↗</span>
         </div>
         <div className="stat-card">
           <span className="stat-icon peach">
@@ -380,7 +376,6 @@ export function HomeView() {
             </strong>
             <span>Mỗi bước lớn khôn của con</span>
           </div>
-          <span className="stat-decoration">✧</span>
         </div>
         <div className="stat-card">
           <span className="stat-icon sage">
@@ -397,7 +392,6 @@ export function HomeView() {
             </strong>
             <span>Một hành trình đầy yêu thương</span>
           </div>
-          <span className="stat-decoration">♡</span>
         </div>
       </div>
       <BirthConfirmation />
@@ -407,7 +401,7 @@ export function HomeView() {
             <div className="section-heading">
               <div>
                 <h2>
-                  Kỷ niệm gần đây <span className="tiny-flower">✳</span>
+                  Kỷ niệm gần đây
                 </h2>
                 <p>Những khoảnh khắc muốn giữ thật lâu.</p>
               </div>
@@ -428,7 +422,6 @@ export function HomeView() {
           <section className="quick-section">
             <div className="section-heading">
               <h2>Hôm nay, mình lưu gì nhỉ?</h2>
-              <span className="handwritten">a little something ♡</span>
             </div>
             <div className="quick-grid">
               <button onClick={() => openEvent()}>
@@ -458,7 +451,7 @@ export function HomeView() {
             </div>
           </section>
           <div className="quote-card">
-            <span>“</span>
+            <span aria-hidden="true">“</span>
             <p>
               Con sẽ lớn, những ngày này sẽ qua.
               <br />
@@ -472,7 +465,7 @@ export function HomeView() {
             <div className="section-heading">
               <h2>
                 {tracking ? "Sắp đến rồi" : "Một khoảng bình yên"}{" "}
-                <span>✧</span>
+                <span aria-hidden="true">✧</span>
               </h2>
               <CalendarDays size={18} />
             </div>
@@ -893,7 +886,6 @@ export function OnboardingView() {
         <span className="onboarding-symbol">
           <Sprout size={37} />
         </span>
-        <div className="eyebrow">MỖI HÀNH TRÌNH BẮT ĐẦU BẰNG YÊU THƯƠNG</div>
         <h1>Chào con, một thế giới mới.</h1>
         <p>Thêm một thành viên nhỏ, mở một cuốn sách đầy kỷ niệm.</p>
       </div>
@@ -1342,11 +1334,11 @@ export function SettingsView() {
         description="Để hành trình luôn vừa vặn với gia đình mình."
       />
       <div className="settings-layout">
-        {mode === "server" && <><NotificationSettings /><AuditHistory /><PrivacyControls family /><Link className="button button-secondary" href="/account">Quản lý tài khoản</Link></>}
+        {mode === "server" && <><NotificationSettings /><AuditHistory /><PrivacyControls family /></>}
         <section className="settings-card">
           <ShieldCheck className="settings-feature-icon" size={30} />
           <h2>Dữ liệu & quyền riêng tư</h2>
-          {mode === "server" ? <><p>Dữ liệu hành trình được lưu trong tài khoản gia đình trên máy chủ. Trình duyệt không lưu dữ liệu tài khoản vào localStorage.</p><p>Ảnh và xác minh/khôi phục email khả dụng khi được bật trên máy chủ. Bạn có thể quản lý lựa chọn nhận nhắc lịch ở bên dưới.</p><AccountSignOut /></> : <><p>
+          {mode === "server" ? <><p>Dữ liệu hành trình được lưu trong tài khoản gia đình trên máy chủ. Trình duyệt không lưu dữ liệu tài khoản vào localStorage.</p><p>Ảnh và xác minh/khôi phục email khả dụng khi được bật trên máy chủ. Bạn có thể quản lý lựa chọn nhận nhắc lịch trong mục Nhắc lịch.</p></> : <><p>
             Mory hiện là bản trải nghiệm, chưa có tài khoản hay đồng bộ máy chủ.
             Dữ liệu và ảnh được lưu trong localStorage của trình duyệt này; có
             thể mất khi xóa bộ nhớ, đổi thiết bị hoặc dùng chế độ riêng tư.
@@ -1355,28 +1347,31 @@ export function SettingsView() {
             Chế độ demo không phải nơi lưu trữ an toàn cho dữ liệu trẻ em. Vui
             lòng dùng dữ liệu giả lập.
           </p>}
-          <button
-            className="button button-secondary"
-            onClick={async () => {
-              let exported: unknown = data;
-              if (mode === "server") {
-                try { const result = await exportFamilyData(); if (!result.ok) { notify(result.error); return; } exported = result.data; }
-                catch { notify("Chưa xuất được dữ liệu. Vui lòng thử lại."); return; }
-              }
-              const blob = new Blob([JSON.stringify(exported, null, 2)], {
-                type: "application/json",
-              });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `mory-ky-niem-${todayVN()}.json`;
-              a.click();
-              URL.revokeObjectURL(url);
-            }}
-          >
-            <Download size={17} />
-            Xuất bản sao dữ liệu
-          </button>
+          <div className="settings-actions">
+            {mode === "server" && <Link className="button button-secondary" href="/account">Quản lý tài khoản</Link>}
+            <button
+              className="button button-secondary"
+              onClick={async () => {
+                let exported: unknown = data;
+                if (mode === "server") {
+                  try { const result = await exportFamilyData(); if (!result.ok) { notify(result.error); return; } exported = result.data; }
+                  catch { notify("Chưa xuất được dữ liệu. Vui lòng thử lại."); return; }
+                }
+                const blob = new Blob([JSON.stringify(exported, null, 2)], {
+                  type: "application/json",
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `mory-ky-niem-${todayVN()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
+              <Download size={17} />
+              Xuất bản sao dữ liệu
+            </button>
+          </div>
         </section>
         <section className="settings-card">
           <h2>Về Mory</h2>

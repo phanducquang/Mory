@@ -30,7 +30,7 @@ mkdir "$RELEASE"
 
 printf '%s\n' '--- 1. Prepare release and install locked dependencies ---'
 tar -C "$ROOT" --exclude='src/server/db/generated' --exclude='.env' --exclude='.env.*' -cf - \
-  package.json package-lock.json next.config.ts tsconfig.json prisma.config.ts eslint.config.mjs src public prisma scripts \
+  package.json package-lock.json next.config.ts tsconfig.json prisma.config.ts eslint.config.mjs tokens.css src public prisma scripts \
   | tar -C "$RELEASE" -xf -
 (
   cd "$RELEASE"

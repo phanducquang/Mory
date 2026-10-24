@@ -92,7 +92,7 @@ test("avatar replacement persists; another family and a viewer cannot mutate pri
   expect((await page.request.delete(second, { headers: { Origin: origin } })).status()).toBe(403);
   expect((await page.request.post(`/api/media/avatar/${a.id}`, { headers: { Origin: origin, "Content-Type": "image/png" }, data: (await picture()).buffer })).status()).toBe(403);
   await page.reload(); await expect(page.locator('.media-manager input[type="file"]')).toHaveCount(0);
-  await page.goto("/settings"); await page.getByRole("button", { name: "Đăng xuất", exact: true }).click();
+  await page.goto("/account"); await page.getByRole("button", { name: "Đăng xuất", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/); expect((await page.request.get(second)).status()).toBe(401);
 });
 

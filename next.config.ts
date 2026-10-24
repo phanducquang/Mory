@@ -4,7 +4,15 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   devIndicators: false,
   turbopack: {
-    rules: { "*.css": { loaders: ["@tailwindcss/turbopack"], as: "*.css" } },
+    rules: {
+      "*.css": {
+        // Preserve Next.js's native scoped class exports for CSS Modules.
+        condition: { not: { path: /\.module\.css$/ } },
+        loaders: ["@tailwindcss/turbopack"],
+        // Classify loader output directly; keep its original file identity.
+        type: "css",
+      },
+    },
   },
   async headers() {
     return [

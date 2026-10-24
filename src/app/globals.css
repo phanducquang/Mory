@@ -1579,6 +1579,25 @@ a {
 .settings-layout {
   max-width: 850px;
 }
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.settings-actions > .button {
+  min-height: 44px;
+  white-space: normal;
+  text-align: center;
+}
+.settings-actions > [role="alert"] {
+  flex-basis: 100%;
+}
+@media (max-width: 600px) {
+  .settings-actions > .button {
+    width: 100%;
+  }
+}
 .settings-feature-icon {
   color: #aa95bb;
   margin-bottom: 17px;
@@ -1896,6 +1915,26 @@ a {
   border-radius: 50%;
   width: 22px;
   height: 22px;
+  flex-shrink: 0;
+}
+.toast-message {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.toast-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin-left: 4px;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+}
+.toast-close:hover {
+  background: var(--lavender);
 }
 .sr-only {
   position: absolute;

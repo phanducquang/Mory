@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,6 +13,7 @@ const inputSchema = z.object({
 export function AuthForm({ registerAccount = false, allowSignup, emailEnabled = false }: { registerAccount?: boolean; allowSignup: boolean; emailEnabled?: boolean }) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const fieldId = useId();
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<z.infer<typeof inputSchema>>({ resolver: zodResolver(inputSchema), defaultValues: { name: "", email: "", password: "" } });
   return <main className="auth-page"><div className="auth-card">
     <Link href="/" className="brand"><Sprout /> mory.</Link>
@@ -33,11 +34,11 @@ export function AuthForm({ registerAccount = false, allowSignup, emailEnabled = 
       } catch { setError("Chưa kết nối được máy chủ. Vui lòng thử lại."); }
     })} noValidate>
       {registerAccount && <label className="form-field"><span className="form-label">Tên của bạn</span><input className="form-input" autoComplete="name" maxLength={120} {...register("name")} required /></label>}
-      <label className="form-field"><span className="form-label">Email</span><input className="form-input" type="email" autoComplete="email" {...register("email")} required /></label>
-      {errors.email && <p className="form-error" role="alert">{errors.email.message}</p>}
-      <label className="form-field"><span className="form-label">Mật khẩu</span><input className="form-input" type="password" autoComplete={registerAccount ? "new-password" : "current-password"} {...register("password")} required /></label>
-      {errors.password && <p className="form-error" role="alert">{errors.password.message}</p>}
-      {registerAccount && <p className="form-help">Dùng ít nhất 12 ký tự. {emailEnabled ? "Xác minh email trước khi đăng nhập. Bạn có thể đặt lại mật khẩu qua email." : "Email tài khoản chưa được bật trên máy chủ này."}</p>}
+      <label className="form-field"><span className="form-label">Email</span><input className="form-input" type="email" autoComplete="email" aria-invalid={!!errors.email} aria-describedby={errors.email ? `${fieldId}-email-error` : undefined} {...register("email")} required /></label>
+      {errors.email && <p className="form-error" role="alert" id={`${fieldId}-email-error`}>{errors.email.message}</p>}
+      <label className="form-field"><span className="form-label">Mật khẩu</span><input className="form-input" type="password" autoComplete={registerAccount ? "new-password" : "current-password"} aria-invalid={!!errors.password} aria-describedby={errors.password ? `${fieldId}-password-error` : registerAccount ? `${fieldId}-password-help` : undefined} {...register("password")} required /></label>
+      {errors.password && <p className="form-error" role="alert" id={`${fieldId}-password-error`}>{errors.password.message}</p>}
+      {registerAccount && <p className="form-help" id={`${fieldId}-password-help`}>{errors.password ? "" : "Dùng ít nhất 12 ký tự. "}{emailEnabled ? "Xác minh email trước khi đăng nhập. Bạn có thể đặt lại mật khẩu qua email." : "Bạn có thể đăng ký và đăng nhập ngay. Gửi email xác minh và khôi phục mật khẩu hiện chưa được bật."}</p>}
       {error && <p className="form-error" role="alert">{error}</p>}
       <button className="button button-primary" disabled={isSubmitting || (registerAccount && !allowSignup)}>{isSubmitting ? "Đang kết nối…" : registerAccount ? "Tạo tài khoản" : "Đăng nhập"}</button>
     </form>}

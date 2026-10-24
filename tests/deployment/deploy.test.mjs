@@ -51,6 +51,7 @@ test('build failure preserves the active release; real PM2 starts, reloads, upda
   await cp(path.join(repo, 'src/server/auth/config.ts'), path.join(root, 'src/server/auth/config.ts'));
   await writeFile(path.join(root, 'scripts/privacy-maintenance.ts'), `import {appendFileSync} from 'node:fs'; appendFileSync(process.env.MORY_TEST_TRACE!, process.env.BETTER_AUTH_SECRET ? 'leaked-auth\\n' : 'privacy-pass\\n');`);
   for (const file of ['package.json', 'package-lock.json', 'next.config.ts', 'tsconfig.json', 'prisma.config.ts', 'eslint.config.mjs']) await writeFile(path.join(root, file), '{}');
+  await writeFile(path.join(root, 'tokens.css'), ':root { --color-accent: rebeccapurple; }');
   const socket = net.createServer(); await new Promise((resolve) => socket.listen(0, '127.0.0.1', resolve));
   const port = socket.address().port; await new Promise((resolve) => socket.close(resolve));
   const envFile = path.join(root, '.env.production');
@@ -82,6 +83,7 @@ http.createServer((req,res)=>{res.setHeader('content-type','application/json');i
     }
     assert.equal(result.code, 0, result.output + diagnostic);
     const first = await readlink(path.join(root, '.deploy/current'));
+    assert.equal(await readFile(path.join(first, 'tokens.css'), 'utf8'), ':root { --color-accent: rebeccapurple; }');
     assert.deepEqual(await (await fetch(`http://127.0.0.1:${port}/fixture`)).json(), { value: 'first' });
     assert.equal((await readFile(trace, 'utf8')).includes('db:migrate'), false);
     result = await run('bash', ['./deploy.sh'], { cwd: root, env: { ...env, MORY_TEST_FAIL_BUILD: 'true' } });

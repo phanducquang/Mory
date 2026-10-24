@@ -1,0 +1,150 @@
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R5 V4 */
+/* Hallmark · macrostructure: Workbench · tone: calm family journal · anchor hue: purple
+ * scope: in-place UI review · system: docs/design-system.md · nav: N3 side rail · footer: Ft2 inline
+ * Existing routes, data flows, imagery and local fonts are preserved.
+ */
+html, body { overflow-x: clip; }
+body { font-family: var(--font-body); color: var(--color-ink); }
+h1, h2, h3 { min-width: 0; overflow-wrap: anywhere; font-family: var(--font-display); font-style: normal; }
+.app-shell h1, .app-shell h2, .app-shell h3 { color: var(--color-ink); }
+.page-heading h1 { font-size: var(--text-page); }
+.app-shell p, .app-shell small, .app-shell label, .app-shell legend,
+.app-shell .form-help, .app-shell .form-optional, .app-shell .eyebrow,
+.app-shell .brand-tagline, .app-shell .family-label, .app-shell .desktop-location,
+.app-shell .private-label, .app-shell .info-row, .app-shell .info-row strong,
+.app-shell .timeline-options, .app-shell .timeline-entry-date,
+.app-shell .page-footer, .app-shell .demo-tag, .app-shell .memory-meta > span:last-child,
+.app-shell .stat-card div > span, .app-shell .quick-grid small,
+.app-shell .polaroid > span:last-child { color: var(--color-muted); }
+.page-heading p, .settings-card > p, .settings-card .form-help,
+.onboarding-intro p, .profile-card p { font-size: var(--text-body); line-height: 1.7; }
+.app-shell .form-help, .form-help, .form-optional { font-size: var(--text-small); }
+.app-shell .hero-copy p { font-size: var(--text-body); line-height: 1.7; }
+.hero-copy h2 span { color: var(--color-accent-strong); }
+.hero-badge, .hero-age small, .app-shell .brand-tagline, .app-shell .family-label,
+.app-shell .polaroid > span:last-child { font-size: var(--text-caption); }
+.app-shell .hero-badge { color: var(--color-muted); letter-spacing: 0.06em; }
+.app-shell .text-link, .app-shell .hero-link, .app-shell .milestone-link,
+.app-shell .all-events, .app-shell .gentle-card a, .app-shell .nav-link,
+.app-shell .bottom-nav a, .app-shell .bottom-nav a.active { color: var(--color-accent-strong); }
+.app-shell .text-link, .app-shell .hero-link, .app-shell .milestone-link,
+.app-shell .all-events, .app-shell .gentle-card a { font-size: var(--text-small); }
+.app-shell .badge, .app-shell .photo-count { color: var(--color-accent-strong); font-size: var(--text-caption); }
+.app-shell .badge.rose, .app-shell .badge.peach { color: var(--color-danger); }
+.app-shell .badge.sage, .app-shell .quote-card strong { color: var(--color-success); }
+.app-shell .header-avatar, .app-shell .parent-avatar { color: var(--color-accent-strong); }
+.app-shell .milestone-lunar-date { color: var(--color-muted) !important; }
+.settings-card, .form-card, .memory-card, .stat-card, .upcoming-panel, .modal-panel, .auth-card { background-color: var(--color-surface); }
+.button, .form-input, .form-select { min-height: var(--control-height); }
+.button { font-size: var(--text-body); white-space: nowrap; }
+.button-primary { background-color: var(--color-accent); color: var(--color-accent-ink); }
+.button-secondary { color: var(--color-accent-strong); border-color: var(--color-control); }
+.button-danger { color: var(--color-danger); background-color: var(--color-danger-surface); }
+.button:disabled, button:disabled { cursor: not-allowed; }
+.button[aria-busy="true"], button[aria-busy="true"] { cursor: progress; }
+.button:active:not(:disabled), .account-menu-item:active { transform: translateY(1px); }
+button, a, input, select, textarea { transition: transform var(--dur-micro) var(--ease-out), opacity var(--dur-micro) var(--ease-out); }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--color-focus); outline-offset: 3px;
+}
+.form-input, .form-select, .form-textarea { border-color: var(--color-control); color: var(--color-ink); font-size: var(--text-input); }
+.form-input::placeholder, .form-textarea::placeholder, .timeline-search input::placeholder { color: var(--color-muted); opacity: 1; }
+.form-input[aria-invalid="true"], .form-select[aria-invalid="true"], .form-textarea[aria-invalid="true"] { border-color: var(--color-danger); }
+.form-error, .app-shell .form-error { color: var(--color-danger); background: var(--color-danger-surface); font-size: var(--text-small); }
+.form-label, .form-legend, .app-shell .form-label, .app-shell .form-legend { color: var(--color-muted); font-size: var(--text-body); }
+.form-actions { align-items: center; gap: var(--space-sm); }
+.settings-actions { gap: var(--space-sm); align-items: center; }
+.settings-actions > .button { font-size: var(--text-body); white-space: nowrap; }
+.section-heading p, .memory-body p, .timeline-entry-content p, .milestone-row p { font-size: var(--text-small); line-height: 1.7; }
+.app-shell .stat-card strong small, .app-shell .stat-card div > span, .app-shell .quick-grid small { font-size: var(--text-caption); }
+.app-shell .memory-body h3, .app-shell .quick-grid strong { font-size: var(--text-body); }
+.app-shell .upcoming-event h3, .app-shell .upcoming-event div > span { font-size: var(--text-small); }
+.app-shell .milestone-row h3 { font-size: var(--text-body); }
+.info-row { flex-wrap: wrap; gap: var(--space-xs) var(--space-md); font-size: var(--text-body); }
+.info-row strong { overflow-wrap: anywhere; }
+.icon-button, .header-avatar, .modal-close, .toast-close { min-width: var(--control-height); min-height: var(--control-height); }
+.filter-tabs button { min-height: var(--control-height); font-size: var(--text-small); color: var(--color-muted); }
+.filter-tabs button.selected { color: var(--color-accent-strong); }
+.timeline-search input, .timeline-options select { min-height: var(--control-height); color: var(--color-muted); font-size: var(--text-body); }
+.timeline-search { padding-block: 0; color: var(--color-muted); border-color: var(--color-control); }
+.timeline-options { flex-wrap: wrap; gap: var(--space-sm); font-size: var(--text-small); }
+.timeline-options > div { flex-wrap: wrap; gap: var(--space-sm); }
+.timeline-options .text-link, .birth-options button, .delete-event { min-height: var(--control-height); }
+.profile-columns, .form-grid { grid-template-columns: minmax(0, 1fr); }
+.segmented-options { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-sm); }
+.segment { justify-content: flex-start; min-height: var(--control-height); white-space: nowrap; font-size: var(--text-body); }
+.segment span { white-space: nowrap; }
+.segment.is-selected { color: var(--color-accent-strong); }
+.onboarding-privacy { font-size: var(--text-caption); line-height: 1.6; }
+.auth-page { padding: var(--space-lg) var(--space-md); background: var(--color-paper); }
+.auth-card { padding: var(--space-lg); border-color: var(--color-rule); }
+.auth-card > p { color: var(--color-muted); font-size: var(--text-body); line-height: 1.7; }
+.auth-card .form-stack { gap: var(--space-md); }
+.auth-card a:not(.brand):not(.button) { color: var(--color-accent-strong); text-decoration: underline; text-underline-offset: 3px; }
+.auth-card .form-stack > .button { width: 100%; }
+.account-card { max-width: 640px; }
+.account-card > .settings-card { padding: var(--space-lg) 0; border: 0; border-radius: 0; margin: 0; background: transparent; }
+.account-back-link { display: inline-flex; align-items: center; min-height: var(--control-height); font-size: var(--text-body); }
+.account-session { padding-top: var(--space-lg); margin-top: var(--space-lg); border-top: var(--rule-width) solid var(--color-rule); }
+.account-session h2 { font-size: var(--text-section); margin-bottom: var(--space-xs); }
+.account-session p { color: var(--color-muted); font-size: var(--text-body); line-height: 1.7; margin-bottom: var(--space-md); }
+.account-card .settings-card > p { color: var(--color-muted); }
+.app-shell .sidebar-note strong, .app-shell .date-box strong,
+.app-shell .gentle-card > span { color: var(--color-muted); }
+.account-session > .button { width: 100%; }
+.account-menu { position: relative; margin-top: var(--space-md); border-top: var(--rule-width) solid var(--color-rule); }
+.account-menu-trigger { display: flex; align-items: center; gap: var(--space-xs); min-height: 76px; padding-block: var(--space-md); cursor: pointer; list-style: none; }
+.account-menu-trigger::-webkit-details-marker { display: none; }
+.account-menu-name { min-width: 0; flex: 1; }
+.account-menu-name strong, .account-menu-name small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-menu-name strong { font-size: var(--text-body); }
+.account-menu-name small { font-size: var(--text-caption); color: var(--color-muted); }
+.account-menu-panel { position: absolute; bottom: calc(100% - var(--space-xs)); left: 0; width: max(100%, 224px); padding: var(--space-xs); background: var(--color-surface); border: var(--rule-width) solid var(--color-rule); border-radius: var(--radius-card); z-index: var(--z-dropdown); }
+.account-menu-item { display: flex; align-items: center; gap: var(--space-xs); width: 100%; min-height: var(--control-height); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-control); background: transparent; color: var(--color-ink); font-size: var(--text-body); white-space: nowrap; text-align: start; }
+.account-menu-divider { height: var(--rule-width); margin: var(--space-xs) 0; background: var(--color-rule); }
+.account-menu-signout { color: var(--color-muted); }
+.signout-error { margin-top: var(--space-xs); }
+.toast { color: var(--color-muted); background: var(--color-surface); }
+.toast-message { font-size: var(--text-small); }
+.toast > span { color: var(--color-success); }
+.app-shell .page-footer, .app-shell .demo-tag { font-size: var(--text-caption); }
+.app-shell .brand-dot { color: var(--color-accent); }
+.app-shell .page-footer { flex-wrap: wrap; line-height: 1.7; }
+@media (hover: hover) {
+  .account-menu-item:hover, .account-menu-trigger:hover { background: var(--color-surface-soft); color: var(--color-ink); }
+  .button-primary:hover { background: var(--color-accent-strong); color: var(--color-accent-ink); }
+  .form-input:hover:not(:disabled), .form-select:hover:not(:disabled), .form-textarea:hover:not(:disabled) { background: var(--color-surface-soft); }
+}
+@media (max-width: 639px) {
+  .page-heading { flex-direction: column; align-items: flex-start; gap: var(--space-md); }
+  .page-heading > .button { width: auto; height: auto; min-height: var(--control-height); margin: 0; padding: var(--space-xs) var(--space-md); font-size: var(--text-body); gap: var(--space-xs); }
+  .section-heading { flex-direction: column; align-items: flex-start; gap: var(--space-xs); }
+  .notification-panel .section-heading { flex-direction: row; align-items: center; }
+  .upcoming-panel > .section-heading { flex-direction: row; align-items: center; }
+  .section-heading > .text-link { display: inline-flex; align-items: center; min-height: var(--control-height); }
+  .profile-card { flex-wrap: wrap; gap: var(--space-md); }
+  .profile-card > .button { flex-basis: 100%; width: 100%; margin: 0; font-size: var(--text-body); }
+  .profile-card > div:nth-child(2) { min-width: 0; flex: 1; }
+  .birth-banner > .button { width: 100%; }
+  .birth-options { flex-wrap: wrap; justify-content: flex-start; gap: var(--space-xs); }
+  .filter-tabs { justify-content: flex-start; gap: var(--space-xs); }
+  .timeline-options > span { max-width: none; }
+  .topbar-right { gap: var(--space-xs); }
+  .topbar { padding-inline: var(--space-md); }
+  .topbar-location { min-width: 0; }
+  .topbar .icon-button, .header-avatar { min-width: var(--control-height); min-height: var(--control-height); }
+  .bottom-nav { background: var(--color-surface); }
+  .bottom-nav a { min-height: var(--control-height); font-size: var(--text-caption); }
+  .bottom-nav > button { min-width: var(--control-height); min-height: var(--control-height); }
+  .settings-actions > .button { width: 100%; }
+}
+@media (min-width: 640px) {
+  .profile-columns, .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .segmented-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .account-session > .button { width: auto; }
+  .auth-card { padding: var(--space-xl); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

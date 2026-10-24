@@ -20,6 +20,7 @@
     "test:db": "node scripts/test-database.mjs",
     "test:account": "npm run build && node scripts/test-database.mjs --e2e",
     "media:maintain": "node --conditions=react-server --import tsx scripts/media-maintenance.ts",
+    "storage:check": "node --conditions=react-server --import tsx scripts/check-storage.ts",
     "test:media": "npm run build && node scripts/test-database.mjs --media --e2e",
     "auth:mail": "node --conditions=react-server --import tsx scripts/auth-mail.ts",
     "test:email": "npm run build && node scripts/test-database.mjs --email --e2e",

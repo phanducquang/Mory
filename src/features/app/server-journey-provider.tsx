@@ -11,12 +11,16 @@ import { JourneyContextProvider } from "./journey-provider";
 import { ChildForm } from "@/features/children/child-form";
 import { EventForm } from "@/features/events/event-form";
 import { Dialog } from "@/components/ui/dialog";
+import { Toast } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
+import { AccountSignOut } from "@/features/auth/account-sign-out";
+export { AccountSignOut } from "@/features/auth/account-sign-out";
 
 export function ServerJourneyProvider({ initialSnapshot, children }: { initialSnapshot: AccountSnapshot; children: ReactNode }) {
   const router = useRouter();
   const [snapshot, setSnapshot] = useState(initialSnapshot);
   const [error, setError] = useState("");
-  const [toast, setToast] = useState("");
+  const [toast, setToast] = useToast();
   const [busy, setBusy] = useState(false);
   const locked = useRef(false);
   const [revision, setRevision] = useState(0);
@@ -60,7 +64,7 @@ export function ServerJourneyProvider({ initialSnapshot, children }: { initialSn
     <AccountSignOut />
   </div></main>;
   return <JourneyContextProvider.Provider value={{
-    mode: "server", revision, remindersEnabled: snapshot.remindersEnabled, notificationsEnabled: snapshot.notificationsEnabled,
+    mode: "server", accountName: snapshot.displayName, revision, remindersEnabled: snapshot.remindersEnabled, notificationsEnabled: snapshot.notificationsEnabled,
     saveNotifications: async (enabled) => { setSnapshot(await setEmailNotifications(enabled)); setRevision((v) => v + 1); }, mediaEnabled: snapshot.mediaEnabled, canWrite: snapshot.canWrite,
     refreshMedia: async (eventId) => { setSnapshot(await refreshAccountMedia(eventId)); setRevision((v) => v + 1); router.refresh(); }, data, child, ready: true, error, toast,
     switchChild: async (id) => {
@@ -76,7 +80,7 @@ export function ServerJourneyProvider({ initialSnapshot, children }: { initialSn
   }}>
     <SessionBoundary />{children}
     {busy && <div className="toast" role="status">Đang lưu thay đổi…</div>}
-    {!busy && toast && <div className="toast" role="status"><button onClick={() => setToast("")} aria-label="Đóng thông báo">✓</button> {toast}</div>}
+    {!busy && toast && <Toast message={toast} onClose={() => setToast("")} />}
     {error && <div className="error-banner" role="alert">{error}</div>}
     {!snapshot.canWrite && <div className="error-banner" role="status">Bạn đang xem với quyền chỉ đọc.</div>}
     <Dialog open={eventOpen} title={editing ? "Chỉnh sửa kỷ niệm" : "Lưu một kỷ niệm mới"} onClose={() => { if (!busy) setEventOpen(false); }} wide>
@@ -87,15 +91,4 @@ export function ServerJourneyProvider({ initialSnapshot, children }: { initialSn
       }} />}
     </Dialog>
   </JourneyContextProvider.Provider>;
-}
-
-export function AccountSignOut() {
-  const [error, setError] = useState("");
-  return <><button className="button button-secondary" onClick={async () => {
-    try {
-      const response = await fetch("/api/auth/sign-out", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
-      if (!response.ok) throw new Error();
-      window.location.replace("/login");
-    } catch { setError("Chưa đăng xuất được. Vui lòng thử lại."); }
-  }}>Đăng xuất</button>{error && <p role="alert">{error}</p>}</>;
 }

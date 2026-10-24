@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   ArrowUpRight,
   Bell,
@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useJourney } from "@/features/app/journey-provider";
 import { PwaSupport } from "@/components/pwa/pwa-support";
+import { AccountMenu } from "@/features/auth/account-menu";
 const navigation = [
   { href: "/home", label: "Tổ ấm", icon: House },
   { href: "/timeline", label: "Hành trình", icon: BookOpen },
@@ -27,8 +28,22 @@ const navigation = [
 ];
 export function AppShell({ children }: { children: ReactNode }) {
   const path = usePathname();
-  const { data, child, switchChild, openEvent, mode } = useJourney();
+  const { data, child, switchChild, openEvent, mode, accountName, remindersEnabled } = useJourney();
   const [notifications, setNotifications] = useState(false);
+  const notificationPanel = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!notifications) return;
+    const outside = (event: PointerEvent) => {
+      if (event.target instanceof Node && !notificationPanel.current?.contains(event.target)) setNotifications(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setNotifications(false); notificationPanel.current?.querySelector("button")?.focus();
+    };
+    document.addEventListener("pointerdown", outside);
+    document.addEventListener("keydown", escape);
+    return () => { document.removeEventListener("pointerdown", outside); document.removeEventListener("keydown", escape); };
+  }, [notifications]);
   const title = path.startsWith("/timeline")
     ? "Hành trình của con"
     : path.startsWith("/events")
@@ -106,22 +121,23 @@ export function AppShell({ children }: { children: ReactNode }) {
               <br />
               <strong>Ký ức ở lại mãi.</strong>
             </p>
-            <span>✧</span>
+            <span aria-hidden="true">✧</span>
           </div>
           <Link
             href="/settings"
             className={`nav-link ${path === "/settings" ? "active" : ""}`}
+            aria-current={path === "/settings" ? "page" : undefined}
           >
             <Settings size={19} /> Cài đặt
           </Link>
-          <div className="family-profile">
+          {mode === "server" ? <AccountMenu name={accountName} /> : <div className="family-profile">
             <div className="parent-avatar">G</div>
             <div>
               <strong>Gia đình nhỏ</strong>
               <small>Góc bình yên của chúng mình</small>
             </div>
             <Heart size={15} />
-          </div>
+          </div>}
         </div>
       </aside>
       <div className="main-wrap">
@@ -149,7 +165,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <ChevronDown size={13} />
             </div>
             <span className="desktop-location">
-              Không gian của bạn <span>/</span> <strong>{title}</strong>
+              Không gian của bạn <span aria-hidden="true">/</span> <strong>{title}</strong>
             </span>
           </div>
           <div className="topbar-right">
@@ -157,18 +173,18 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span />
               Riêng tư & yêu thương
             </span>
-            <div className="notification-wrap">
+            <div className="notification-wrap" ref={notificationPanel}>
               <button
                 className="icon-button"
                 aria-label="Thông báo"
                 onClick={() => setNotifications(!notifications)}
                 aria-expanded={notifications}
+                aria-controls="family-notifications"
               >
                 <Bell size={20} />
-                <i />
               </button>
               {notifications && (
-                <div className="notification-panel">
+                <div className="notification-panel" id="family-notifications" role="region" aria-label="Nhắc nhở của gia đình">
                   <div className="section-heading">
                     <h3>Nhắc nhở của gia đình</h3>
                     <button
@@ -180,8 +196,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                     </button>
                   </div>
                   <p>
-                    Các cuộc hẹn sắp tới được hiển thị trong mục Sự kiện. Bản
-                    hiện chưa gửi thông báo tự động.
+                    {mode === "server" && remindersEnabled
+                      ? "Xem các cuộc hẹn trong mục Sự kiện. Bạn có thể chọn nhận nhắc lịch qua email trong Cài đặt."
+                      : "Xem các cuộc hẹn trong mục Sự kiện. Gửi nhắc lịch tự động hiện chưa được bật."}
                   </p>
                   <Link href="/events" onClick={() => setNotifications(false)}>
                     Xem các cuộc hẹn <ArrowUpRight size={15} />
@@ -190,11 +207,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               )}
             </div>
             <Link
-              href="/settings"
+              href={mode === "server" ? "/account" : "/settings"}
               className="header-avatar"
-              aria-label="Cài đặt gia đình"
+              aria-label={mode === "server" ? "Quản lý tài khoản" : "Cài đặt gia đình"}
             >
-              G
+              {mode === "server" ? Array.from(accountName?.trim() || "Tài khoản")[0].toLocaleUpperCase("vi-VN") : "G"}
             </Link>
           </div>
         </header>
@@ -216,6 +233,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             key={n.href}
             href={n.href}
             className={path.startsWith(n.href) ? "active" : ""}
+            aria-current={path.startsWith(n.href) ? "page" : undefined}
           >
             <n.icon size={21} />
             <span>{n.label === "Hồ sơ của bé" ? "Hồ sơ" : n.label}</span>

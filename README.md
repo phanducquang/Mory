@@ -36,7 +36,7 @@ Playwright tự khởi động dev server nếu chưa có; đặt `PLAYWRIGHT_BA
 - **Implemented milestone domain:** lifecycle, sinh nhật dương lịch/29-02, bộ lịch Việt Nam UTC+7 với fixtures đối chiếu và kiểm tra hai chiều; gợi ý đầy tháng/thôi nôi theo quy tắc gia đình; cột mốc tự động trên timeline; cột mốc riêng có thể để trống ngày. Hỗ trợ năm âm lịch 1976–2100; ngoài phạm vi không đoán ngày. Ngày tổ chức luôn cần gia đình xác nhận. Xem [phạm vi và kiểm chứng lịch](docs/lunar-calendar-verification.md).
 - **Implemented data layer:** Prisma 7.10.1 + PostgreSQL repository theo family; kiểm tra membership/role; transaction cho lifecycle, event/cột mốc, quota ảnh và hàng đợi dọn ảnh. Có migration SQL và integration tests trên PostgreSQL 17 dùng riêng cho kiểm thử. Xem [hướng dẫn database](src/server/db/README.md).
 - **Implemented account mode (Phase 5A):** Better Auth email/mật khẩu, session PostgreSQL, đăng ký bật/tắt bằng cấu hình, tạo gia đình, đăng xuất, dữ liệu server nối UI và Server Actions có validation/phân quyền. Timeline tìm kiếm tiếng Việt/phân trang tại DB; dữ liệu tài khoản không ghi vào localStorage. Bật bằng `MORY_DATA_MODE=server` cùng DB/origin/secret đã cấu hình; mặc định vẫn là demo. Xem [hướng dẫn tài khoản](docs/authentication.md).
-- **Implemented private media (Phase 5B):** private S3/MinIO qua session, xác minh/chuẩn hóa WebP và bỏ metadata, ảnh sự kiện/avatar, quota và worker expiry/cleanup/reconciliation có retry. Bật riêng bằng `MORY_MEDIA_ENABLED=true`; xem [cấu hình và vận hành ảnh](docs/private-media.md).
+- **Implemented private media (Phase 5B):** private S3 qua session, xác minh/chuẩn hóa WebP và bỏ metadata, ảnh sự kiện/avatar, quota và worker expiry/cleanup/reconciliation có retry. Có [hướng dẫn RustFS](docs/rustfs.md) và compatibility check; integration fixture hiện có dùng MinIO. Bật riêng bằng `MORY_MEDIA_ENABLED=true`; xem [cấu hình và vận hành ảnh](docs/private-media.md).
 - **Implemented email (Phase 5C):** xác minh email, đặt lại mật khẩu, thu hồi session, SMTP outbox mã hóa có lease/retry/expiry; bật riêng theo [hướng dẫn](docs/account-email.md).
 - **Implemented reminders (Phase 5D):** scheduler nhắc lịch email theo opt-in, idempotent và kiểm tra quyền trước SMTP; [hướng dẫn](docs/reminders.md).
 - **Implemented privacy/recovery (Phase 5E):** audit metadata theo family, reauthentication, ownership transfer, account/family deletion với cleanup, retention và backup/restore AES-GCM có deletion ledger; [runbook](docs/privacy-backup.md).
@@ -51,6 +51,8 @@ Service worker chỉ cache static assets công khai được chỉ định. Khô
 
 ## Tài liệu
 
+- [RustFS trực tiếp trên Ubuntu và kiểm tra S3 compatibility](docs/rustfs.md)
+- [Rà soát UI theo Hallmark](docs/ui-review-hallmark.md)
 - [Kiến trúc](docs/architecture.md)
 - [Yêu cầu sản phẩm](docs/product-requirements.md)
 - [Design system](docs/design-system.md)
@@ -82,6 +84,8 @@ Kiểm thử cả private media: `npm run test:media`; runner thêm MinIO/bucket
 Ảnh minh họa công khai từ Unsplash: [ảnh em bé](https://images.unsplash.com/photo-1519689680058-324335c77eba), [ảnh gia đình](https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4). Đây chỉ là ảnh minh họa demo, không phải ảnh người dùng.
 
 ## Kết quả kiểm tra
+
+Ngày **24/10/2026**: rà soát UI theo Hallmark và bổ sung hướng dẫn/compatibility check RustFS. **115 unit**, **16 journey E2E trên standalone production**, **2 deployment tests với PM2 cô lập**, lint, typecheck và build production pass. Kiểm tra UI 50 lượt theo 10 màn hình × 5 chiều rộng; xem [phạm vi và giới hạn](docs/ui-review-hallmark.md). Chưa kết nối hay nghiệm thu instance RustFS thật; cần chạy [storage check/probe](docs/rustfs.md) trên phiên bản đích.
 
 Ngày **19/10/2026**: đã hoàn tất các phase phát triển trong repo tới **5F**. **98 unit**, **60 integration**, **12 account E2E**, **54 demo/PWA/CSP E2E** (desktop Chromium, Android Chromium, iPhone WebKit emulation) pass. Lint, strict typecheck, Prisma validation, calendar reproducibility, production Docker build/smoke UID 1001 và backup/privacy worker checks pass. Image app cuối: `mory:phase5f-final`. Runtime audit 0 vulnerabilities; tooling ESLint chain còn 5 high như ghi bên dưới. Test infrastructure local đã được dọn; không push/merge/deploy hoặc thay DB/bucket/SMTP ngoài.
 

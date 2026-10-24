@@ -17,9 +17,12 @@ import { todayVN } from "@/lib/dates";
 import { browserJourneyRepository } from "./demo-repository";
 import { EventForm } from "@/features/events/event-form";
 import { Dialog } from "@/components/ui/dialog";
+import { Toast } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 
 export type JourneyContext = {
   mode: "demo" | "server";
+  accountName?: string;
   revision?: number;
   mediaEnabled?: boolean;
   remindersEnabled?: boolean;
@@ -59,7 +62,7 @@ export function JourneyProvider({
   const [data, setData] = useState(initialData);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
-  const [toast, setToast] = useState("");
+  const [toast, setToast] = useToast();
   const [eventOpen, setEventOpen] = useState(false);
   const [editing, setEditing] = useState<Event>();
   useEffect(() => {
@@ -75,11 +78,6 @@ export function JourneyProvider({
     });
     return () => cancelAnimationFrame(frame);
   }, []);
-  useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => setToast(""), 4000);
-    return () => clearTimeout(timer);
-  }, [toast]);
   const commit = (next: DemoData) => {
     browserJourneyRepository.save(next);
     setData(next);
@@ -218,11 +216,7 @@ export function JourneyProvider({
           {error}
         </div>
       )}
-      {toast && (
-        <div className="toast" role="status">
-          <span>✓</span> {toast}
-        </div>
-      )}
+      {toast && <Toast message={toast} onClose={() => setToast("")} />}
       <Dialog
         open={eventOpen}
         title={editing ? "Chỉnh sửa kỷ niệm" : "Lưu một kỷ niệm mới"}

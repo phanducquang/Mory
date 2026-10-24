@@ -1,0 +1,43 @@
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R5 V4 */
+/* Mory UI review: existing warm paper, purple brand, local Vietnamese font stack. */
+:root {
+  --color-paper: oklch(98.205% 0.00411 91.446);
+  --color-surface: oklch(99.751% 0.0017 67.803);
+  --color-surface-soft: oklch(95.149% 0.01143 308.327);
+  --color-ink: oklch(30.485% 0.01996 297.688);
+  --color-muted: oklch(48.838% 0.0352 306.641);
+  --color-accent: oklch(55.012% 0.11276 297.063);
+  --color-accent-strong: oklch(48.474% 0.10801 297.115);
+  --color-accent-ink: var(--color-surface);
+  --color-rule: oklch(89.05% 0.01744 308.243);
+  --color-control: oklch(65.079% 0.04616 309.851);
+  --color-danger: oklch(49.001% 0.1032 23.124);
+  --color-danger-surface: oklch(96.098% 0.01329 28.866);
+  --color-success: oklch(45.749% 0.06379 138.68);
+  --color-focus: oklch(23% 0.025 300);
+  --font-body: Arial, "Helvetica Neue", sans-serif;
+  --font-display: var(--font-body);
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --text-caption: 0.75rem;
+  --text-small: 0.8125rem;
+  --text-body: 0.875rem;
+  --text-input: 1rem;
+  --text-section: 1.125rem;
+  --text-page: clamp(1.5rem, 1.1rem + 1.4vw, 2rem);
+  --control-height: 2.75rem;
+  --radius-control: 0.5625rem;
+  --radius-card: 1rem;
+  --rule-width: 1px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --z-dropdown: 100;
+}

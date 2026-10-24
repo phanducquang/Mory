@@ -17,11 +17,11 @@ export function readStorageConfiguration() {
     parsed.protocol !== "https:" &&
     !(
       parsed.protocol === "http:" &&
-      ["localhost", "127.0.0.1", "minio"].includes(parsed.hostname)
+      ["localhost", "127.0.0.1", "[::1]", "minio", "rustfs"].includes(parsed.hostname)
     )
   ) {
     throw new Error(
-      "Storage endpoint requires HTTPS, except local MinIO development.",
+      "Storage endpoint requires HTTPS, except local S3 development.",
     );
   }
   return {

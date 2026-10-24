@@ -3,9 +3,12 @@ import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, List
 import { MAX_IMAGE_BYTES, type PrivateObjectStorage } from "./contracts";
 import type { readStorageConfiguration } from "./config";
 
-export function createS3Storage(config: ReturnType<typeof readStorageConfiguration>): PrivateObjectStorage {
-  const client = new S3Client({ endpoint: config.endpoint, region: config.region, forcePathStyle: config.forcePathStyle,
+export function createS3Client(config: ReturnType<typeof readStorageConfiguration>) {
+  return new S3Client({ endpoint: config.endpoint, region: config.region, forcePathStyle: config.forcePathStyle,
     credentials: { accessKeyId: config.accessKeyId, secretAccessKey: config.secretAccessKey }, maxAttempts: 2 });
+}
+
+export function createS3Storage(config: ReturnType<typeof readStorageConfiguration>, client = createS3Client(config)): PrivateObjectStorage {
   const timeout = () => ({ abortSignal: AbortSignal.timeout(20_000) });
   return {
     async assertEmptyNamespace() {

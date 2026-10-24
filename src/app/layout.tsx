@@ -1,6 +1,8 @@
 import { headers } from "next/headers";
 import type { Metadata, Viewport } from "next";
+import "../../tokens.css";
 import "./globals.css";
+import "./ui-review.css";
 export const metadata: Metadata = {
   title: {
     default: "Mory · Mỗi kỷ niệm, một câu chuyện",

@@ -16,7 +16,17 @@ async function signup(page: Page, name = "Gia đình E2E", expecting = false) {
   await page.getByLabel("Mật khẩu", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Tạo tài khoản", exact: true }).click();
   await completeVerification(page, email, password);
-  await page.getByRole("button", { name: "Tạo không gian gia đình" }).click();
+  const createFamily = page.getByRole("button", { name: "Tạo không gian gia đình" });
+  const accountLink = page.getByRole("link", { name: "Quản lý tài khoản", exact: true });
+  await expect(createFamily).toBeVisible();
+  await expect(accountLink).toBeVisible();
+  // Catch missing CSS Module exports in the real Next.js browser flow.
+  await expect.poll(async () => {
+    const button = await createFamily.boundingBox();
+    const link = await accountLink.boundingBox();
+    return button && link ? link.y - (button.y + button.height) : -1;
+  }).toBeGreaterThanOrEqual(24);
+  await createFamily.click();
   await expect(page.getByRole("heading", { name: "Bắt đầu hành trình của con" })).toBeVisible();
   if (expecting) {
     await page.getByLabel("Ngày dự sinh", { exact: false }).fill("2024-12-15");
@@ -43,7 +53,7 @@ async function createMemory(page: Page, title: string) {
   await expect(dialog).not.toBeVisible();
 }
 async function logout(page: Page) {
-  await page.goto("/settings");
+  await page.goto("/account");
   await page.getByRole("button", { name: "Đăng xuất", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
 }
@@ -59,6 +69,9 @@ test("real signup, onboarding, event edits, reload, logout and login persist wit
   const account = await signup(page, "Bé tài khoản A");
   await page.screenshot({ path: "/private/tmp/mory-account-home.png", fullPage: true });
   await createMemory(page, "Kỷ niệm tài khoản A");
+  const savedToast = page.getByRole("status").filter({ hasText: "Đã lưu thay đổi vào tài khoản gia đình" });
+  await expect(savedToast).toBeVisible();
+  await expect(savedToast).toBeHidden({ timeout: 6000 });
   const event = (await pool.query('SELECT * FROM "Event" WHERE "familyId"=$1', [account.familyId])).rows[0];
   await page.goto(`/events/${event.id}`);
   await page.getByRole("button", { name: "Chỉnh sửa", exact: true }).click();
@@ -66,7 +79,11 @@ test("real signup, onboarding, event edits, reload, logout and login persist wit
   await dialog.getByLabel("Tên sự kiện", { exact: false }).fill("Kỷ niệm đã sửa A");
   await dialog.getByLabel("Ngày diễn ra", { exact: false }).fill("2024-03-11");
   await dialog.getByRole("button", { name: "Lưu thay đổi", exact: true }).click();
-  await expect(dialog).not.toBeVisible(); await page.reload();
+  await expect(dialog).not.toBeVisible();
+  await expect(savedToast).toBeVisible();
+  await savedToast.getByRole("button", { name: "Đóng thông báo", exact: true }).click();
+  await expect(savedToast).toBeHidden();
+  await page.reload();
   await expect(page.getByRole("heading", { name: "Kỷ niệm đã sửa A", exact: true })).toBeVisible();
   const edited = (await pool.query('SELECT * FROM "Event" WHERE "id"=$1', [event.id])).rows[0];
   expect(edited.createdAt.toISOString()).toBe(event.createdAt.toISOString());
