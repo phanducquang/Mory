@@ -71,14 +71,14 @@ export function EventForm({
   onSave,
   onClose,
   childId,
-  mediaEnabled = true,
+  imageMode = "local",
   remindersAvailable = false,
 }: {
   event?: Event;
   onSave: (event: Event) => void;
   onClose: () => void;
   childId: string;
-  mediaEnabled?: boolean;
+  imageMode?: "local" | "after-save" | "disabled";
   remindersAvailable?: boolean;
 }) {
   const formId = useId();
@@ -244,7 +244,7 @@ export function EventForm({
         )}
       </div>
 
-      {mediaEnabled ? <div className="form-field">
+      {imageMode === "local" ? <div className="form-field">
         <label className="form-label" htmlFor={`${formId}-images`}>
           Hình ảnh <span className="form-optional">(tùy chọn)</span>
         </label>
@@ -340,7 +340,9 @@ export function EventForm({
         )}
       </div>
 
-      : <p className="form-help">Lưu sự kiện trước, rồi thêm ảnh trong trang chi tiết khi tính năng ảnh của gia đình được bật.</p>}
+      : <p className="form-help">{imageMode === "after-save"
+        ? event ? "Thêm hoặc xóa ảnh trong trang chi tiết sự kiện." : "Lưu sự kiện để mở trang chi tiết và thêm ảnh."
+        : "Tính năng ảnh chưa được bật trên máy chủ này."}</p>}
 
       <div className="reminder-note">
         <label className="checkbox-row" htmlFor={`${formId}-reminder`}>

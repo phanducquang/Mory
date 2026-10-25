@@ -31,6 +31,9 @@ async function signup(page: Page, name: string) {
 }
 async function createEvent(page: Page) {
   await page.getByRole("button", { name: "Lưu kỷ niệm mới", exact: true }).click();
+  const form = page.getByRole("dialog");
+  await expect(form.getByText("Lưu sự kiện để mở trang chi tiết và thêm ảnh.", { exact: true })).toBeVisible();
+  await expect(form.locator('input[type="file"]')).toHaveCount(0);
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel("Tên sự kiện", { exact: false }).fill("Ngày lưu ảnh riêng tư");
   await dialog.getByLabel("Ngày diễn ra", { exact: false }).fill("2024-03-10");

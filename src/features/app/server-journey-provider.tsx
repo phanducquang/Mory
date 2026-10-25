@@ -37,7 +37,7 @@ export function ServerJourneyProvider({ initialSnapshot, children }: { initialSn
       if (!result.ok) { setError(result.error); return false; }
       setSnapshot(result.snapshot); setRevision((v) => v + 1); setToast("Đã lưu thay đổi vào tài khoản gia đình");
       router.refresh();
-      if (snapshot.mediaEnabled && "createdEventId" in result && result.createdEventId) router.push(`/events/${result.createdEventId}`);
+      if (result.snapshot.mediaEnabled && "createdEventId" in result && result.createdEventId) router.push(`/events/${result.createdEventId}`);
       return true;
     } catch { setError("Chưa thể kết nối. Vui lòng tải lại hoặc đăng nhập lại."); return false; }
     finally { locked.current = false; setBusy(false); }
@@ -84,7 +84,7 @@ export function ServerJourneyProvider({ initialSnapshot, children }: { initialSn
     {error && <div className="error-banner" role="alert">{error}</div>}
     {!snapshot.canWrite && <div className="error-banner" role="status">Bạn đang xem với quyền chỉ đọc.</div>}
     <Dialog open={eventOpen} title={editing ? "Chỉnh sửa kỷ niệm" : "Lưu một kỷ niệm mới"} onClose={() => { if (!busy) setEventOpen(false); }} wide>
-      {eventOpen && <EventForm event={editing} childId={editing?.childId ?? child.id} mediaEnabled={false} remindersAvailable={snapshot.remindersEnabled} onClose={() => setEventOpen(false)} onSave={async (event) => {
+      {eventOpen && <EventForm event={editing} childId={editing?.childId ?? child.id} imageMode={snapshot.mediaEnabled ? "after-save" : "disabled"} remindersAvailable={snapshot.remindersEnabled} onClose={() => setEventOpen(false)} onSave={async (event) => {
         const operation = editing ? { kind: "updateEvent", eventId: editing.id, input: { ...event, images: [] } } : { kind: "createEvent", childId: event.childId, input: { ...event, images: [] } };
         if (await execute(operation)) setEventOpen(false);
         else throw new Error("Chưa lưu được sự kiện. Kiểm tra thông báo và thử lại.");
