@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { readFile, cp, mkdir, symlink, rename, readlink, writeFile } from 'node:fs/promises';
+import { access, readFile, cp, mkdir, symlink, rename, readlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { deploymentConfig, runtimeEnvironment, requireRelease } from './deploy-config.mjs';
@@ -38,6 +38,8 @@ async function main() {
   }
   if (mode === 'prepare') {
     const release = path.resolve(args[0]);
+    try { await access(path.join(release, '.next/standalone/server.js')); }
+    catch { throw new Error('Build thiếu .next/standalone/server.js. Đặt turbopack.root và outputFileTracingRoot tại thư mục release trong next.config.ts, rồi build lại.'); }
     await cp(path.join(release, 'public'), path.join(release, '.next/standalone/public'), { recursive: true });
     await cp(path.join(release, '.next/static'), path.join(release, '.next/standalone/.next/static'), { recursive: true });
     const marker = JSON.stringify({ release: path.basename(release) });

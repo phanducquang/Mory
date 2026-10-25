@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { readHttpOrigin } from "../../../scripts/config-origin.mjs";
 
 export function serverDataEnabled() {
   const mode = process.env.MORY_DATA_MODE ?? "demo";
@@ -15,11 +16,5 @@ export function readAuthConfig(env: Record<string, string | undefined> = process
 }
 
 export function readAppOrigin(value: string | undefined) {
-  let baseURL: URL;
-  try { baseURL = new URL(value ?? ""); } catch { throw new Error("Cần cấu hình BETTER_AUTH_URL hợp lệ."); }
-  const local = ["localhost", "127.0.0.1", "[::1]"].includes(baseURL.hostname);
-  if (baseURL.username || baseURL.password || baseURL.pathname !== "/" || baseURL.search || baseURL.hash ||
-    (baseURL.protocol !== "https:" && !(local && baseURL.protocol === "http:")))
-    throw new Error("BETTER_AUTH_URL phải là origin HTTPS hoặc HTTP localhost.");
-  return baseURL;
+  return readHttpOrigin(value, "BETTER_AUTH_URL");
 }

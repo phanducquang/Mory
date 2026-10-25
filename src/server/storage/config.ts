@@ -1,6 +1,7 @@
 import "server-only";
 
 import { ServerNotConfiguredError } from "../services/access";
+import { readHttpOrigin } from "../../../scripts/config-origin.mjs";
 
 /** Read only on the server. Do not serialize this object into Client Components. */
 export function readStorageConfiguration() {
@@ -11,19 +12,7 @@ export function readStorageConfiguration() {
   const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
   if (!endpoint || !region || !bucket || !accessKeyId || !secretAccessKey)
     throw new ServerNotConfiguredError("Private object storage");
-  const parsed = new URL(endpoint);
-  if (parsed.username || parsed.password || parsed.pathname !== "/" || parsed.search || parsed.hash) throw new Error("Storage endpoint must be an origin.");
-  if (
-    parsed.protocol !== "https:" &&
-    !(
-      parsed.protocol === "http:" &&
-      ["localhost", "127.0.0.1", "[::1]", "minio", "rustfs"].includes(parsed.hostname)
-    )
-  ) {
-    throw new Error(
-      "Storage endpoint requires HTTPS, except local S3 development.",
-    );
-  }
+  readHttpOrigin(endpoint, "S3_ENDPOINT");
   return {
     endpoint,
     region,

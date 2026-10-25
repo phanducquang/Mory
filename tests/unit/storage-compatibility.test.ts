@@ -9,11 +9,11 @@ const config = { endpoint: "https://s3.example.test", region: "us-east-1", bucke
 afterEach(() => vi.unstubAllEnvs());
 
 describe("S3-compatible storage configuration", () => {
-  it.each(["http://rustfs:9000", "http://localhost:9000", "http://127.0.0.1:9000", "http://[::1]:9000", "https://s3.example.test"])("accepts %s without changing the S3 contract", endpoint => {
+  it.each(["http://rustfs:9000", "http://localhost:9000", "http://127.0.0.1:9000", "http://[::1]:9000", "http://10.0.0.5:9000", "http://s3.example.test:9000", "https://s3.example.test"])("accepts %s without changing the S3 contract", endpoint => {
     for (const [name, value] of Object.entries({ S3_ENDPOINT: endpoint, S3_REGION: "us-east-1", S3_BUCKET: "private-test", S3_ACCESS_KEY_ID: "test", S3_SECRET_ACCESS_KEY: "test", S3_FORCE_PATH_STYLE: "true" })) vi.stubEnv(name, value);
     expect(readStorageConfiguration()).toEqual({ ...config, endpoint });
   });
-  it.each(["http://s3.example.test", "https://s3.example.test/console", "https://user:password@s3.example.test", "https://s3.example.test?token=secret"])("rejects non-TLS remote endpoints or non-origin configuration: %s", endpoint => {
+  it.each(["ftp://s3.example.test", "https://s3.example.test/console", "https://user:password@s3.example.test", "https://s3.example.test?token=secret", "http://s3.example.test#fragment"])("rejects non-HTTP protocols or non-origin configuration: %s", endpoint => {
     for (const [name, value] of Object.entries({ S3_ENDPOINT: endpoint, S3_REGION: "us-east-1", S3_BUCKET: "private-test", S3_ACCESS_KEY_ID: "test", S3_SECRET_ACCESS_KEY: "test" })) vi.stubEnv(name, value);
     expect(() => readStorageConfiguration()).toThrow();
   });

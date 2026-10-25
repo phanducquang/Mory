@@ -10,6 +10,8 @@ Hướng dẫn chạy **trực tiếp trên VPS Ubuntu, không cần Docker**: [
 
 Yêu cầu Node.js 22.12+ và npm.
 
+Deploy và runtime chấp nhận `BETTER_AUTH_URL`/`S3_ENDPOINT` là origin HTTP hoặc HTTPS trên IP/hostname, có port nếu dùng; không có path/query/fragment/credential. `BETTER_AUTH_URL` phải khớp URL người dùng mở. HTTP ngoài localhost có giới hạn PWA/offline và truyền dữ liệu không mã hóa. `next.config.ts` cố định Turbopack/tracing root theo từng release để tránh lỗi thiếu `.next/standalone/server.js` khi có nhiều lockfile. Kiểm tra build release thật bằng `npm run test:deploy:build`; kiểm tra validation và PM2 bằng `npm run test:deploy` (đặt `MORY_TEST_PM2_BIN` để chạy daemon PM2 cô lập).
+
 ```sh
 npm ci
 npm run dev

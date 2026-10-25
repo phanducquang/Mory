@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { parseEnv } from 'node:util';
 import path from 'node:path';
+import { readHttpOrigin } from './config-origin.mjs';
 
 // Pure Node: usable before npm ci. Never source dotenv as shell code or print its values.
 export function deploymentConfig(root, source = process.env) {
@@ -28,11 +29,11 @@ export function deploymentConfig(root, source = process.env) {
   };
   if (server) {
     required('DATABASE_URL'); required('BETTER_AUTH_URL'); required('BETTER_AUTH_SECRET');
-    let database, origin;
-    try { database = new URL(values.DATABASE_URL); origin = new URL(values.BETTER_AUTH_URL); }
-    catch { throw new Error('DATABASE_URL hoặc BETTER_AUTH_URL không hợp lệ.'); }
+    let database;
+    try { database = new URL(values.DATABASE_URL); }
+    catch { throw new Error('DATABASE_URL không hợp lệ.'); }
     if (!['postgres:', 'postgresql:'].includes(database.protocol) || !database.hostname || database.pathname.length < 2) throw new Error('DATABASE_URL phải trỏ tới PostgreSQL.');
-    if (origin.username || origin.password || origin.pathname !== '/' || origin.search || origin.hash) throw new Error('BETTER_AUTH_URL production phải là origin HTTPS, không có path.');
+    readHttpOrigin(values.BETTER_AUTH_URL, 'BETTER_AUTH_URL');
     if (values.BETTER_AUTH_SECRET.length < 32) throw new Error('BETTER_AUTH_SECRET cần ít nhất 32 ký tự ngẫu nhiên.');
   }
   if (email) {
@@ -49,11 +50,7 @@ export function deploymentConfig(root, source = process.env) {
   if (reminders && !email) throw new Error('Nhắc lịch cần AUTH_EMAIL_ENABLED=true.');
   if (media) {
     for (const field of ['S3_ENDPOINT', 'S3_REGION', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY']) required(field);
-    let endpoint;
-    try { endpoint = new URL(values.S3_ENDPOINT); } catch { throw new Error('S3_ENDPOINT không hợp lệ.'); }
-    // Same-host storage may use HTTP; other hosts still require TLS.
-    const loopbackHttp = endpoint.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(endpoint.hostname);
-    if ((endpoint.protocol !== 'https:' && !loopbackHttp) || endpoint.username || endpoint.password || endpoint.pathname !== '/' || endpoint.search || endpoint.hash) throw new Error('S3_ENDPOINT phải là origin HTTPS hoặc HTTP trên localhost, 127.0.0.1, [::1]; không có path, query hoặc credential.');
+    readHttpOrigin(values.S3_ENDPOINT, 'S3_ENDPOINT');
   }
   if (values.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY) key('NEXT_SERVER_ACTIONS_ENCRYPTION_KEY');
   if (values.AUTH_TRUSTED_EDGE_SECRET && values.AUTH_TRUSTED_EDGE_SECRET.length < 32) throw new Error('AUTH_TRUSTED_EDGE_SECRET cần ít nhất 32 ký tự.');
@@ -72,5 +69,6 @@ export function runtimeEnvironment(config, role, parent = process.env) {
 }
 
 export function requireRelease(current) {
-  if (!existsSync(path.join(current, '.next/standalone/server.js')) || !existsSync(path.join(current, 'public/_mory-release.json'))) throw new Error('Chưa có release hoàn chỉnh; chạy ./deploy.sh trước.');
+  if (!existsSync(path.join(current, '.next/standalone/server.js'))) throw new Error('Thiếu .next/standalone/server.js. Kiểm tra turbopack.root và outputFileTracingRoot trỏ tới thư mục release, rồi chạy lại ./deploy.sh.');
+  if (!existsSync(path.join(current, 'public/_mory-release.json'))) throw new Error('Thiếu release marker; chạy ./deploy.sh để chuẩn bị release.');
 }

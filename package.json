@@ -27,7 +27,8 @@
     "reminders:schedule": "node --conditions=react-server --import tsx scripts/reminders.ts",
     "privacy:maintain": "node --conditions=react-server --import tsx scripts/privacy-maintenance.ts",
     "backup": "node --conditions=react-server --import tsx scripts/backup.ts",
-    "test:deploy": "node --test tests/deployment/deploy.test.mjs"
+    "test:deploy": "node --test tests/deployment/deploy.test.mjs",
+    "test:deploy:build": "node --test tests/deployment/standalone.test.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.1152.0",

@@ -40,12 +40,43 @@ test('dotenv is literal, feature validation fails closed, and web credentials ar
   } finally { await rm(directory, { recursive: true, force: true }); }
 });
 
+test('deployment and runtime agree on HTTP/HTTPS origins before connecting to any service', async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'mory-deploy-storage-'));
+  const file = path.join(directory, '.env.production');
+  const base = `MORY_DATA_MODE=server\nDATABASE_URL=postgresql://fixture:fixture@127.0.0.1:1/fixture\nBETTER_AUTH_URL=https://mory.example.test\nBETTER_AUTH_SECRET=${'s'.repeat(40)}\nMORY_MEDIA_ENABLED=true\nS3_REGION=us-east-1\nS3_BUCKET=private-test\nS3_ACCESS_KEY_ID=fixture\nS3_SECRET_ACCESS_KEY=fixture\nS3_FORCE_PATH_STYLE=true\n`;
+  try {
+    for (const endpoint of ['http://localhost:9000', 'http://127.0.0.1:9000/', 'http://[::1]:9000', 'http://10.0.0.5:9000', 'http://rustfs:9000', 'http://s3.example.test:9000', 'https://s3.example.test']) {
+      await writeFile(file, `${base}S3_ENDPOINT="${endpoint}"\n`, { mode: 0o600 });
+      const config = deploymentConfig(directory, {});
+      assert.equal(config.values.S3_ENDPOINT, endpoint);
+      assert.ok(config.kinds.includes('media'));
+      const envFile = path.join(directory, '.env.production');
+      const result = await run(process.execPath, ['--conditions=react-server', '--import', 'tsx', 'scripts/deploy-tools.mjs', 'runtime-check'], { cwd: repo, env: { ...process.env, MORY_ENV_FILE: envFile } });
+      assert.equal(result.code, 0, result.output);
+    }
+    for (const endpoint of ['http://127.0.0.1:9000/bucket', 'http://127.0.0.1:9000?token=fixture', 'http://127.0.0.1:9000#fragment', 'http://fixture:fixture@127.0.0.1:9000', 'ftp://127.0.0.1:9000', 'https://s3.example.test/bucket', 'not-a-url']) {
+      await writeFile(file, `${base}S3_ENDPOINT="${endpoint}"\n`);
+      assert.throws(() => deploymentConfig(directory, {}), /S3_ENDPOINT/, endpoint);
+    }
+    for (const origin of ['http://mory.example.test', 'http://10.0.0.5:3000', 'https://mory.example.test']) {
+      await writeFile(file, `${base.replace('BETTER_AUTH_URL=https://mory.example.test', `BETTER_AUTH_URL=${origin}`)}S3_ENDPOINT=http://rustfs:9000\n`);
+      deploymentConfig(directory, {});
+      const result = await run(process.execPath, ['--conditions=react-server', '--import', 'tsx', 'scripts/deploy-tools.mjs', 'runtime-check'], { cwd: repo, env: { ...process.env, MORY_ENV_FILE: file } });
+      assert.equal(result.code, 0, result.output);
+    }
+    for (const origin of ['ftp://mory.example.test', 'http://mory.example.test/path', 'http://fixture:fixture@mory.example.test', 'http://mory.example.test?token=fixture', 'http://mory.example.test#fragment']) {
+      await writeFile(file, `${base.replace('BETTER_AUTH_URL=https://mory.example.test', `BETTER_AUTH_URL="${origin}"`)}S3_ENDPOINT=http://rustfs:9000\n`);
+      assert.throws(() => deploymentConfig(directory, {}), /BETTER_AUTH_URL/, origin);
+    }
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});
+
 // A real, isolated PM2 daemon + tiny HTTP fixture exercise orchestration; no Next build/real DB here.
 test('build failure preserves the active release; real PM2 starts, reloads, updates env and restores a release', { skip: !pm2Bin, timeout: 90_000 }, async () => {
   const directory = await mkdtemp(path.join(os.tmpdir(), 'mory-deploy-flow-'));
   const root = path.join(directory, 'project with spaces'); const bin = path.join(directory, 'bin');
   await mkdir(root); await mkdir(bin); await mkdir(path.join(root, 'scripts'));
-  for (const file of ['deploy.sh', 'ecosystem.config.js', 'scripts/deploy-tools.mjs', 'scripts/deploy-config.mjs', 'scripts/pm2-entry.mjs']) await cp(path.join(repo, file), path.join(root, file));
+  for (const file of ['deploy.sh', 'ecosystem.config.js', 'scripts/deploy-tools.mjs', 'scripts/deploy-config.mjs', 'scripts/config-origin.mjs', 'scripts/pm2-entry.mjs']) await cp(path.join(repo, file), path.join(root, file));
   for (const folder of ['src', 'public', 'prisma']) await mkdir(path.join(root, folder));
   await mkdir(path.join(root, 'src/server/auth'), { recursive: true });
   await cp(path.join(repo, 'src/server/auth/config.ts'), path.join(root, 'src/server/auth/config.ts'));
@@ -103,7 +134,7 @@ http.createServer((req,res)=>{res.setHeader('content-type','application/json');i
     assert.equal(result.code, 0, result.output);
     // A rollback changes code only: the shared environment remains current.
     assert.deepEqual(await (await fetch(`http://127.0.0.1:${port}/fixture`)).json(), { value: 'second' });
-    const serverEnv = `MORY_DATA_MODE=server\nPORT=${port}\nDATABASE_URL=postgresql://fixture:fixture@127.0.0.1:1/fixture\nBETTER_AUTH_URL=https://mory.example.test\nBETTER_AUTH_SECRET=${'s'.repeat(40)}\n`;
+    const serverEnv = `MORY_DATA_MODE=server\nPORT=${port}\nDATABASE_URL=postgresql://fixture:fixture@127.0.0.1:1/fixture\nBETTER_AUTH_URL=http://mory.example.test\nBETTER_AUTH_SECRET=${'s'.repeat(40)}\n`;
     await writeFile(envFile, serverEnv);
     result = await run('bash', ['./deploy.sh', '--migrate'], { cwd: root, env });
     assert.equal(result.code, 0, result.output);

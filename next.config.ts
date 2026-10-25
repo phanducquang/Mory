@@ -1,9 +1,12 @@
 import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Releases have their own lockfile/dependencies inside .deploy/releases/.
+  outputFileTracingRoot: __dirname,
   poweredByHeader: false,
   devIndicators: false,
   turbopack: {
+    root: __dirname,
     rules: {
       "*.css": {
         // Preserve Next.js's native scoped class exports for CSS Modules.
