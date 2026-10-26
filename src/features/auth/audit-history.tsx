@@ -3,7 +3,7 @@ import { useState } from "react";
 import { readAudit } from "@/app/actions/audit";
 import { useJourney } from "@/features/app/journey-provider";
 type Page = Awaited<ReturnType<typeof readAudit>>;
-const labels: Record<string, string> = { Family: "gia đình", FamilyMember: "thành viên", Child: "hồ sơ bé", Event: "sự kiện", ChildMilestone: "cột mốc", MediaAsset: "ảnh" };
+const labels: Record<string, string> = { Family: "gia đình", FamilyMember: "thành viên", FamilyInvitation: "lời mời", Child: "hồ sơ bé", Event: "sự kiện", ChildMilestone: "cột mốc", MediaAsset: "ảnh" };
 const actions: Record<string, string> = { INSERT: "Tạo", UPDATE: "Cập nhật", DELETE: "Xóa" };
 export function AuditHistory() {
   const { canWrite } = useJourney(); const [entries, setEntries] = useState<Page["entries"]>([]); const [next, setNext] = useState<string>();

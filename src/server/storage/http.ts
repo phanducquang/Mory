@@ -19,7 +19,7 @@ async function identity(request: Request, mutation: boolean) {
   if (readAuthConfig().emailEnabled && !session.user.emailVerified) throw new HttpError(403, "Vui lòng xác minh email trước khi mở ảnh gia đình.");
   const members = await db.familyMember.findMany({ where: { userId: session.user.id, family: { deletionRequestedAt: null } }, orderBy: { familyId: "asc" } });
   const requested = request.headers.get("cookie")?.split(";").map((c) => c.trim()).find((c) => c.startsWith("mory-family="))?.slice(12);
-  const member = requested ? members.find((m) => m.familyId === requested) : members[0];
+  const member = members.find((m) => m.familyId === requested) ?? members[0];
   if (!member) throw new ResourceNotFoundError();
   if (mutation && member.role === "VIEWER") throw new HttpError(403, "Bạn chỉ có quyền xem ảnh.");
   return { userId: session.user.id, familyId: member.familyId };

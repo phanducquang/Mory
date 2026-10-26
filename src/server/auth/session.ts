@@ -20,7 +20,7 @@ export async function requireAccount() {
   const memberships = await db.familyMember.findMany({ where: { userId: identity.user.id, family: { deletionRequestedAt: null } }, orderBy: { familyId: "asc" } });
   if (!memberships.length) redirect("/welcome");
   const requested = (await cookies()).get("mory-family")?.value;
-  const member = requested ? memberships.find((m) => m.familyId === requested) : memberships[0];
+  const member = memberships.find((m) => m.familyId === requested) ?? memberships[0];
   if (!member) throw new ResourceNotFoundError();
   return { userId: identity.user.id, familyId: member.familyId, displayName: identity.user.name, role: member.role };
 }

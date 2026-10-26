@@ -14,6 +14,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { Toast } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import { AccountSignOut } from "@/features/auth/account-sign-out";
+import Link from "next/link";
 export { AccountSignOut } from "@/features/auth/account-sign-out";
 
 export function ServerJourneyProvider({ initialSnapshot, children }: { initialSnapshot: AccountSnapshot; children: ReactNode }) {
@@ -59,7 +60,8 @@ export function ServerJourneyProvider({ initialSnapshot, children }: { initialSn
   }
   if (!child) return <main className="auth-page"><div className="auth-card" style={{ maxWidth: 680 }}>
     <h1>Bắt đầu hành trình của con</h1><p>Thêm hồ sơ đầu tiên vào không gian gia đình.</p>
-    <ChildForm mediaEnabled={false} onSave={saveChild} />
+    {snapshot.canWrite ? <ChildForm mediaEnabled={false} onSave={saveChild} /> : <p>Gia đình chưa có hồ sơ bé. Nhờ bố mẹ thêm hồ sơ để bắt đầu xem hành trình.</p>}
+    <div className="settings-actions"><Link className="button button-secondary" href="/family">Thành viên gia đình</Link><Link className="button button-secondary" href="/join">Tham gia gia đình khác</Link></div>
     {error && <p className="form-error" role="alert">{error}</p>}
     <AccountSignOut />
   </div></main>;

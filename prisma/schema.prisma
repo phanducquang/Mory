@@ -88,6 +88,8 @@ model User {
   accounts            AuthAccount[]
   deletionRequestedAt DateTime?          @db.Timestamptz(3)
   mediaBudget         MediaUploadBudget?
+  invitationsCreated  FamilyInvitation[] @relation("InvitationCreator")
+  invitationsAccepted FamilyInvitation[] @relation("InvitationAcceptor")
 }
 
 model AuthSession {
@@ -150,6 +152,26 @@ model Family {
   createdAt           DateTime       @default(now()) @db.Timestamptz(3)
   members             FamilyMember[]
   children            Child[]
+  invitations         FamilyInvitation[]
+}
+
+model FamilyInvitation {
+  id           String     @id @default(uuid()) @db.Uuid
+  familyId     String     @db.Uuid
+  createdById  String     @db.Uuid
+  tokenHash    String     @unique @db.VarChar(64)
+  role         FamilyRole
+  createdAt    DateTime   @default(now()) @db.Timestamptz(3)
+  expiresAt    DateTime   @db.Timestamptz(3)
+  revokedAt    DateTime?  @db.Timestamptz(3)
+  acceptedAt   DateTime?  @db.Timestamptz(3)
+  acceptedById String?    @db.Uuid
+  family       Family     @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  createdBy    User       @relation("InvitationCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  acceptedBy   User?      @relation("InvitationAcceptor", fields: [acceptedById], references: [id], onDelete: SetNull)
+
+  @@index([familyId, createdAt])
+  @@index([expiresAt])
 }
 
 model FamilyMember {

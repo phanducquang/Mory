@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
         ],
       },
-      ...["/verify-email", "/reset-password", "/forgot-password"].map((source) => ({ source, headers: [
+      ...["/verify-email", "/reset-password", "/forgot-password", "/join", "/family"].map((source) => ({ source, headers: [
         { key: "Referrer-Policy", value: "no-referrer" }, { key: "Cache-Control", value: "private, no-store" },
       ] })),
     ];

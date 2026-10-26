@@ -19,6 +19,7 @@ export default async function WelcomePage() {
         <form className={styles.createForm} action={initializeFamily}>
           <button type="submit" className={`button button-primary ${styles.createButton}`}>Tạo không gian gia đình</button>
         </form>
+        <p>Đã có người thân dùng Mory? <Link className={styles.accountLink} href="/join">Tham gia bằng lời mời</Link></p>
         <div className={styles.accountFooter}>
           <Link className={styles.accountLink} href="/account">Quản lý tài khoản</Link>
         </div>

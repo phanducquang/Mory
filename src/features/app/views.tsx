@@ -1334,6 +1334,7 @@ export function SettingsView() {
         description="Để hành trình luôn vừa vặn với gia đình mình."
       />
       <div className="settings-layout">
+        {mode === "server" && <section className="settings-card"><h2>Thành viên gia đình</h2><p>Mời bố mẹ cùng ghi lại hành trình của con, quản lý quyền hoặc chuyển không gian gia đình.</p><Link className="button button-secondary" href="/family">Quản lý thành viên</Link></section>}
         {mode === "server" && <><NotificationSettings /><AuditHistory /><PrivacyControls family /></>}
         <section className="settings-card">
           <ShieldCheck className="settings-feature-icon" size={30} />

@@ -92,6 +92,18 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .app-shell .sidebar-note strong, .app-shell .date-box strong,
 .app-shell .gentle-card > span { color: var(--color-muted); }
 .account-session > .button { width: 100%; }
+.family-card { max-width: 800px; }
+.family-card p, .family-preview p { color: var(--color-muted); font-size: var(--text-body); line-height: 1.7; overflow-wrap: anywhere; }
+.family-card h2, .family-preview h2 { font-size: var(--text-section); }
+.family-section, .family-preview { border-top: var(--rule-width) solid var(--color-rule); padding-top: var(--space-lg); }
+.family-member-list, .family-invitation-list { padding: 0; margin: var(--space-md) 0; list-style: none; }
+.family-member-list > li, .family-invitation-list > li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm); padding-block: var(--space-md); border-bottom: var(--rule-width) solid var(--color-rule); }
+.family-member-list > li > div { flex: 1; min-width: 0; }
+.family-member-list strong, .family-member-list span { display: block; overflow-wrap: anywhere; }
+.family-member-list span, .family-invitation-list span { color: var(--color-muted); font-size: var(--text-body); }
+.family-member-controls { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs); }
+.family-invite-result { margin-top: var(--space-md); }
+.family-preview > .button { margin-top: var(--space-md); }
 .account-menu { position: relative; margin-top: var(--space-md); border-top: var(--rule-width) solid var(--color-rule); }
 .account-menu-trigger { display: flex; align-items: center; gap: var(--space-xs); min-height: 76px; padding-block: var(--space-md); cursor: pointer; list-style: none; }
 .account-menu-trigger::-webkit-details-marker { display: none; }
@@ -116,6 +128,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .form-input:hover:not(:disabled), .form-select:hover:not(:disabled), .form-textarea:hover:not(:disabled) { background: var(--color-surface-soft); }
 }
 @media (max-width: 639px) {
+  .family-member-controls, .family-member-controls > :not(.sr-only), .family-card .button, .family-preview > .button { width: 100%; }
   .page-heading { flex-direction: column; align-items: flex-start; gap: var(--space-md); }
   .page-heading > .button { width: auto; height: auto; min-height: var(--control-height); margin: 0; padding: var(--space-xs) var(--space-md); font-size: var(--text-body); gap: var(--space-xs); }
   .section-heading { flex-direction: column; align-items: flex-start; gap: var(--space-xs); }

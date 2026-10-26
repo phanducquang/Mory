@@ -27,6 +27,7 @@ describe.skipIf(process.env.MORY_MEDIA_ENABLED!=="true")("encrypted database and
    for(let i=0;i<2;i++){
     const user=await db.user.create({data:{displayName:"Recovery private",email:`${randomUUID()}@example.test`,emailVerified:true}});userIds.push(user.id);
     const family=await db.family.create({data:{name:`Recovery ${i}`}});familyIds.push(family.id);await db.familyMember.create({data:{userId:user.id,familyId:family.id,role:"OWNER"}});
+    await db.familyInvitation.create({data:{familyId:family.id,createdById:user.id,tokenHash:randomBytes(32).toString("hex"),role:"PARENT",expiresAt:new Date(Date.now()+86_400_000)}});
     const child=await db.child.create({data:{familyId:family.id,name:"Private child",lifecycle:"AFTER_BIRTH",birthDate:new Date("2024-01-01Z")}});
     const asset=randomUUID();const objectKey=`families/${family.id}/children/${child.id}/avatars/${asset}`;objectKeys.push(objectKey);
     await source.putObject(objectKey,Buffer.from(`private-image-${i}`));
@@ -55,7 +56,7 @@ describe.skipIf(process.env.MORY_MEDIA_ENABLED!=="true")("encrypted database and
    restored=createDatabaseClient(restoreURL.toString());
    expect(await restored.family.findUnique({where:{id:familyIds[0]}})).not.toBeNull();expect(await restored.family.findUnique({where:{id:familyIds[1]}})).toBeNull();
    expect(await restored.user.findUnique({where:{id:userIds[1]}})).toBeNull();
-   expect(await restored.authSession.count()).toBe(0);expect(await restored.authVerification.count()).toBe(0);expect(await restored.authMailJob.count()).toBe(0);
+   expect(await restored.authSession.count()).toBe(0);expect(await restored.authVerification.count()).toBe(0);expect(await restored.authMailJob.count()).toBe(0);expect(await restored.familyInvitation.count()).toBe(0);
    expect(await restored.authAccount.findFirst({where:{userId:userIds[0]}})).toMatchObject({password:null});
    expect((await destination.getObject(objectKeys[0])).toString()).toBe("private-image-0");
    await expect(destination.getObject(objectKeys[1])).rejects.toThrow();

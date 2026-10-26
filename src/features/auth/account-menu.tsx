@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useId, useRef } from "react";
-import { ChevronDown, Settings, UserRound } from "lucide-react";
+import { ChevronDown, Settings, UserRound, UsersRound } from "lucide-react";
 import { AccountSignOut } from "./account-sign-out";
 
 export function AccountMenu({ name }: { name?: string }) {
@@ -31,6 +31,7 @@ export function AccountMenu({ name }: { name?: string }) {
     </summary>
     <div className="account-menu-panel" id={panelId}>
       <Link className="account-menu-item" href="/account" onClick={close}><UserRound size={18} aria-hidden="true" />Quản lý tài khoản</Link>
+      <Link className="account-menu-item" href="/family" onClick={close}><UsersRound size={18} aria-hidden="true" />Thành viên gia đình</Link>
       <Link className="account-menu-item" href="/settings" onClick={close}><Settings size={18} aria-hidden="true" />Cài đặt gia đình</Link>
       <div className="account-menu-divider" />
       <AccountSignOut className="account-menu-item account-menu-signout" />

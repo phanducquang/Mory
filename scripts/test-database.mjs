@@ -144,7 +144,9 @@ try {
       await run("docker", ["run", "--detach", "--rm", "--name", appName, "--network", networkName, "--publish", `127.0.0.1:${appPort}:3000`, "--env-file", "/dev/stdin", appImage], { input: keys.filter((key) => containerEnv[key] !== undefined).map((key) => `${key}=${containerEnv[key]}`).join("\n") + "\n" });
       appCreated = true;
     } else {
-    server = spawn(process.execPath, ["scripts/start.mjs", "--hostname", "127.0.0.1", "--port", String(appPort)], { env: accountEnv, stdio: ["ignore", "pipe", "pipe"] });
+    const appRoot = path.resolve(process.env.MORY_TEST_APP_ROOT || process.cwd());
+    const appCommand = process.env.MORY_TEST_DEV === "true" ? [path.join(appRoot, "node_modules/next/dist/bin/next"), "dev"] : [path.join(appRoot, "scripts/start.mjs")];
+    server = spawn(process.execPath, [...appCommand, "--hostname", "127.0.0.1", "--port", String(appPort)], { env: accountEnv, stdio: ["ignore", "pipe", "pipe"], cwd: appRoot });
     const record = (data) => { serverOutput = (serverOutput + scrub(data)).slice(-8000); };
     server.stdout.on("data", record); server.stderr.on("data", record);
     }

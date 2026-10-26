@@ -51,6 +51,7 @@ export async function maintainPrivacy(db: PrismaClient, storage?: PrivateObjectS
     } catch { stats.failed++; }
   }
   // Metadata only. Family content is removed by the explicit deletion flow, never by age inference.
+  stats.purged += await db.$executeRaw`DELETE FROM "FamilyInvitation" WHERE "id" IN (SELECT "id" FROM "FamilyInvitation" WHERE "expiresAt"<${new Date(now.getTime()-30*DAY)} ORDER BY "expiresAt" LIMIT 1000)`;
   stats.purged += await db.$executeRaw`DELETE FROM "AuditLog" WHERE "id" IN (SELECT "id" FROM "AuditLog" WHERE "createdAt"<${new Date(now.getTime()-90*DAY)} ORDER BY "createdAt" LIMIT 1000)`;
   stats.purged += await db.$executeRaw`DELETE FROM "AuthMailJob" WHERE "id" IN (SELECT "id" FROM "AuthMailJob" WHERE "status"<>'QUEUED' AND "completedAt"<${new Date(now.getTime()-30*DAY)} ORDER BY "completedAt" LIMIT 1000)`;
   stats.purged += await db.$executeRaw`DELETE FROM "AuthMailBudget" WHERE "key" IN (SELECT "key" FROM "AuthMailBudget" WHERE "startedAt"<${new Date(now.getTime()-DAY)} LIMIT 1000)`;

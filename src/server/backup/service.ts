@@ -136,6 +136,8 @@ export async function restoreBackup(connectionString: string, storage: PrivateOb
     });
     if (!complete) throw new Error("Incomplete backup.");
     await write('\nSET search_path=public,pg_catalog; DELETE FROM "AuthSession"; DELETE FROM "AuthVerification"; DELETE FROM "AuthMailJob"; DELETE FROM "AuthRateLimit"; UPDATE "AuthAccount" SET "password"=NULL,"accessToken"=NULL,"refreshToken"=NULL,"idToken"=NULL;\n');
+    // Never revive consumed/revoked invitations from an older snapshot. The guard supports pre-invitation backups.
+    await write(`DO $$ BEGIN IF to_regclass('public."FamilyInvitation"') IS NOT NULL THEN DELETE FROM "FamilyInvitation"; END IF; END $$;\n`);
     // No restored pending reservation may later become READY; cleanup remains durable.
     await write('UPDATE "MediaAsset" SET "status"=\'REJECTED\' WHERE "status"=\'PENDING_VERIFICATION\';\n');
     for (const entry of ledger.entries) {
