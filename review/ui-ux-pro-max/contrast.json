@@ -1,0 +1,87 @@
+[
+  {
+    "foreground": "ink",
+    "background": "surface",
+    "rgb": [
+      [
+        48,
+        45,
+        56
+      ],
+      [
+        255,
+        254,
+        253
+      ]
+    ],
+    "ratio": 13.38
+  },
+  {
+    "foreground": "muted",
+    "background": "surface",
+    "rgb": [
+      [
+        101,
+        91,
+        112
+      ],
+      [
+        255,
+        254,
+        253
+      ]
+    ],
+    "ratio": 6.35
+  },
+  {
+    "foreground": "accent-strong",
+    "background": "surface",
+    "rgb": [
+      [
+        102,
+        80,
+        148
+      ],
+      [
+        255,
+        254,
+        253
+      ]
+    ],
+    "ratio": 6.64
+  },
+  {
+    "foreground": "accent-ink",
+    "background": "accent",
+    "rgb": [
+      [
+        255,
+        254,
+        253
+      ],
+      [
+        121,
+        98,
+        171
+      ]
+    ],
+    "ratio": 5.03
+  },
+  {
+    "foreground": "danger",
+    "background": "danger-surface",
+    "rgb": [
+      [
+        146,
+        70,
+        68
+      ],
+      [
+        251,
+        239,
+        237
+      ]
+    ],
+    "ratio": 5.87
+  }
+]

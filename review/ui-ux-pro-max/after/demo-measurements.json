@@ -1,0 +1,338 @@
+[
+  {
+    "width": 320,
+    "route": "/home",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 320,
+    "route": "/timeline",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 320,
+    "route": "/events",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 320,
+    "route": "/children",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 320,
+    "route": "/onboarding",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "25px",
+    "smallControls": []
+  },
+  {
+    "width": 320,
+    "route": "/settings",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 375,
+    "route": "/home",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 375,
+    "route": "/timeline",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 375,
+    "route": "/events",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 375,
+    "route": "/children",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 375,
+    "route": "/onboarding",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "25px",
+    "smallControls": []
+  },
+  {
+    "width": 375,
+    "route": "/settings",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 390,
+    "route": "/home",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 390,
+    "route": "/timeline",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 390,
+    "route": "/events",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 390,
+    "route": "/children",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 390,
+    "route": "/onboarding",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "25px",
+    "smallControls": []
+  },
+  {
+    "width": 390,
+    "route": "/settings",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 414,
+    "route": "/home",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 414,
+    "route": "/timeline",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 414,
+    "route": "/events",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 414,
+    "route": "/children",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 414,
+    "route": "/onboarding",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "25px",
+    "smallControls": []
+  },
+  {
+    "width": 414,
+    "route": "/settings",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "28px",
+    "smallControls": []
+  },
+  {
+    "width": 768,
+    "route": "/home",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "30.752px",
+    "smallControls": []
+  },
+  {
+    "width": 768,
+    "route": "/timeline",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "30.752px",
+    "smallControls": []
+  },
+  {
+    "width": 768,
+    "route": "/events",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "30.752px",
+    "smallControls": []
+  },
+  {
+    "width": 768,
+    "route": "/children",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "30.752px",
+    "smallControls": []
+  },
+  {
+    "width": 768,
+    "route": "/onboarding",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "30px",
+    "smallControls": []
+  },
+  {
+    "width": 768,
+    "route": "/settings",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "30.752px",
+    "smallControls": []
+  },
+  {
+    "width": 1024,
+    "route": "/home",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "34.336px",
+    "smallControls": []
+  },
+  {
+    "width": 1024,
+    "route": "/timeline",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "34.336px",
+    "smallControls": []
+  },
+  {
+    "width": 1024,
+    "route": "/events",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "34.336px",
+    "smallControls": []
+  },
+  {
+    "width": 1024,
+    "route": "/children",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "34.336px",
+    "smallControls": []
+  },
+  {
+    "width": 1024,
+    "route": "/onboarding",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "30px",
+    "smallControls": []
+  },
+  {
+    "width": 1024,
+    "route": "/settings",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "34.336px",
+    "smallControls": []
+  },
+  {
+    "width": 1440,
+    "route": "/home",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "36px",
+    "smallControls": []
+  },
+  {
+    "width": 1440,
+    "route": "/timeline",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "36px",
+    "smallControls": []
+  },
+  {
+    "width": 1440,
+    "route": "/events",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "36px",
+    "smallControls": []
+  },
+  {
+    "width": 1440,
+    "route": "/children",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "36px",
+    "smallControls": []
+  },
+  {
+    "width": 1440,
+    "route": "/onboarding",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "30px",
+    "smallControls": []
+  },
+  {
+    "width": 1440,
+    "route": "/settings",
+    "overflow": false,
+    "bodySize": "16px",
+    "headingSize": "36px",
+    "smallControls": []
+  }
+]

@@ -57,6 +57,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             : "Tổ ấm của bạn";
   return (
     <div className="app-shell">
+      <a href="#main-content" className="skip-link">Đến nội dung chính</a>
       <aside className="sidebar">
         <Link href="/home" className="brand" aria-label="Mory - về tổ ấm">
           <span className="brand-symbol">
@@ -84,6 +85,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <small>Đồng hành cùng</small>
             <select
               aria-label="Chọn bé"
+              title={child.nickname ?? child.name}
               value={child.id}
               onChange={(e) => switchChild(e.target.value)}
             >
@@ -153,6 +155,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div className="mobile-child-select">
               <select
                 aria-label="Chọn bé trên điện thoại"
+                title={child.nickname ?? child.name}
                 value={child.id}
                 onChange={(e) => switchChild(e.target.value)}
               >
@@ -215,7 +218,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           </div>
         </header>
-        <main className="main-content">
+        <main id="main-content" className="main-content" tabIndex={-1}>
           {children}
           <PwaSupport />
           <footer className="page-footer">
