@@ -2,6 +2,8 @@
 
 UI-only work based on fetched `main` at `89439df`, on `feature/ui-ux-pro-max`. The existing purple identity, photos, routes and product workflows remain intact. No deployment or merge is part of this work.
 
+Review: [Draft PR #1 — Modernize Mory journal UI and accessibility](https://github.com/phanducquang/Mory/pull/1), targeting `main`.
+
 ## Review artifacts
 
 - [Screen-by-screen audit](AUDIT.md)

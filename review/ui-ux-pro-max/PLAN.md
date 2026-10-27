@@ -6,7 +6,7 @@
 - [x] Standardize existing tokens/components and modernize existing screens, without changing handlers/routes/permissions.
 - [x] Verify keyboard, long content, all seven target widths, reduced motion and text zoom; capture after screenshots.
 - [x] Run feasible lint/typecheck/unit/demo/account/build checks; inspect behavior-preservation diff.
-- [ ] Commit only task files and create a review PR targeting main when GitHub access allows. Do not merge or deploy.
+- [x] Commit only task files and create a review PR targeting main: [PR #1](https://github.com/phanducquang/Mory/pull/1). No merge or deployment performed.
 
 ## Explicitly excluded proposals
 
