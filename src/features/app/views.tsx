@@ -614,6 +614,7 @@ export function TimelineView({ eventsOnly = false, initialPage }: { eventsOnly?:
             (t) => (
               <button
                 className={type === t ? "selected" : ""}
+                aria-pressed={type === t}
                 key={t}
                 onClick={() => {
                   setType(t);
