@@ -1,5 +1,8 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { expect, test, type Page } from "@playwright/test";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { devices, expect, test, type Page } from "@playwright/test";
 import pg from "pg";
 import { completeVerification } from "./email-utils";
 import sharp from "sharp";
@@ -42,6 +45,57 @@ async function createEvent(page: Page) {
   return page.url().split("/").at(-1)!;
 }
 const picture = async () => ({ name: "private-photo.png", mimeType: "image/png", buffer: await sharp({ create: { width: 640, height: 480, channels: 3, background: "pink" } }).png().toBuffer() });
+
+test("Android camera-sized files show proxy rejection, then retry, reload and delete correctly", async ({ browser }) => {
+  const context = await browser.newContext({ ...devices["Galaxy S24"], baseURL: origin });
+  const directory = await mkdtemp(path.join(os.tmpdir(), "mory-android-photo-"));
+  let release = () => {};
+  try {
+    const page = await context.newPage();
+    await signup(page, "Ảnh Android kiểm thử");
+    const eventId = await createEvent(page);
+    const endpoint = `/api/media/event/${eventId}`;
+    const photo = await sharp(randomBytes(2048 * 1536 * 3), { raw: { width: 2048, height: 1536, channels: 3 } }).jpeg({ quality: 90 }).toBuffer();
+    expect(photo.length).toBeGreaterThan(1024 * 1024);
+    expect(photo.length).toBeLessThan(8 * 1024 * 1024);
+    const filename = path.join(directory, "camera.jpg");
+    await writeFile(filename, photo);
+    const manager = page.getByRole("region", { name: "Ảnh của kỷ niệm", exact: true });
+    const input = manager.getByLabel("Thêm ảnh", { exact: true });
+    const gate = new Promise<void>(resolve => { release = resolve; });
+    await page.route(`**${endpoint}`, async route => {
+      await gate;
+      await route.fulfill({ status: 413, contentType: "text/html", body: "<html>Request Entity Too Large</html>" });
+    });
+    const outgoing = page.waitForRequest(request => request.url().endsWith(endpoint) && request.method() === "POST");
+    await input.setInputFiles(filename);
+    const request = await outgoing;
+    expect(request.postDataBuffer()).toEqual(photo);
+    expect(request.headers()["content-type"]).toBe("image/jpeg");
+    await expect(input).toBeDisabled();
+    release();
+    await expect(manager.getByRole("alert")).toContainText("HTTP 413");
+    await expect(input).toBeEnabled();
+    expect(await input.inputValue()).toBe("");
+    expect((await pool.query('SELECT count(*)::int AS n FROM "MediaAsset" WHERE "eventId"=$1', [eventId])).rows[0].n).toBe(0);
+    await page.unroute(`**${endpoint}`);
+    // Re-select the exact same disk-backed file and use the real API/storage.
+    await input.setInputFiles(filename);
+    await expect(page.getByText("Đã lưu ảnh riêng tư cho gia đình.", { exact: true })).toBeVisible();
+    await expect(manager.getByRole("alert")).toHaveCount(0);
+    expect(await input.inputValue()).toBe("");
+    await page.reload();
+    const image = page.locator(".detail-photos img");
+    await expect(image).toHaveCount(1);
+    await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBeGreaterThan(0);
+    await page.getByRole("button", { name: "Xóa ảnh 1", exact: true }).click();
+    await expect(image).toHaveCount(0);
+  } finally {
+    release();
+    await context.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
 
 test("upload, reload, edit and delete an event image through the authenticated UI", async ({ page, request }) => {
   await signup(page, "Bé ảnh E2E"); const id = await createEvent(page);

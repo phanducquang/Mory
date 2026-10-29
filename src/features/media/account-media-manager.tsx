@@ -1,6 +1,7 @@
 "use client";
 import { useId, useState } from "react";
 import { useJourney } from "@/features/app/journey-provider";
+import { mediaResponseError } from "./response-error";
 
 export function AccountMediaManager({ purpose, targetId, images }: { purpose: "event" | "avatar"; targetId: string; images: string[] }) {
   const { mediaEnabled, canWrite, refreshMedia } = useJourney();
@@ -14,8 +15,7 @@ export function AccountMediaManager({ purpose, targetId, images }: { purpose: "e
     try {
       const response = await fetch(url, options);
       if (!response.ok) {
-        const result = await response.json().catch(() => null);
-        throw new Error(result?.error ?? "Chưa thể lưu ảnh. Vui lòng thử lại.");
+        throw new Error(await mediaResponseError(response));
       }
       await refreshMedia?.(purpose === "event" ? targetId : undefined);
       setMessage(options.method === "DELETE" ? "Đã xóa ảnh." : "Đã lưu ảnh riêng tư cho gia đình.");

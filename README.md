@@ -31,6 +31,25 @@ npm start
 
 Playwright tự khởi động dev server nếu chưa có; đặt `PLAYWRIGHT_BASE_URL` để dùng server đang chạy. PWA service worker chỉ đăng ký ở production (`npm run build && npm start`), hỗ trợ HTTPS hoặc localhost.
 
+### Tải ảnh báo lỗi khi ảnh lớn hơn khoảng 1 MB
+
+Mory hỗ trợ tối đa **8 MiB/ảnh**. Nếu ảnh nhỏ tải được nhưng ảnh 2 MB bị từ chối, kiểm tra giới hạn của reverse proxy phía trước **ứng dụng Mory**. Nginx mặc định `client_max_body_size 1m` và trả HTTP 413 khi vượt giới hạn ([tài liệu Nginx](https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size)).
+
+Trong block `server` đang phục vụ Mory ở `/etc/nginx/sites-available/mory` (HTTP hoặc HTTPS đang dùng), thêm hoặc cập nhật:
+
+```nginx
+client_max_body_size 9m;
+client_body_timeout 20s;
+```
+
+Có thể include [config/nginx/media-upload.conf](config/nginx/media-upload.conf) thay cho hai dòng trên; dùng đường dẫn tuyệt đối tới checkout ổn định và tránh khai báo trùng directive. Kiểm tra không có `location`/CDN khác đặt mức nhỏ hơn, rồi áp dụng:
+
+```sh
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+Không cần nâng giới hạn Server Actions hoặc public RustFS: ảnh gửi vào `/api/media/event/...` của Mory và ứng dụng vẫn kiểm tra mức 8 MiB. Cấu hình Nginx của RustFS là một đường truyền riêng. Client hiển thị mã HTTP nếu proxy trả HTML/response rỗng để phân biệt 413 với lỗi mạng/quyền truy cập. Xem [kết quả kiểm tra upload](review/media-upload/README.md).
+
 ## Trạng thái thực tế
 
 - **Implemented:** app shell responsive desktop/mobile; nhiều hồ sơ bé; onboarding thai kỳ/sau sinh; dashboard; timeline có tìm kiếm, lọc loại/thời gian, sắp xếp và tải thêm; tạo/sửa/xóa sự kiện; ngày diễn ra riêng với timestamp; ảnh có kiểm tra MIME, chữ ký và giới hạn; hồ sơ, xác nhận chào đời, tạm dừng/kết thúc hành trình; chọn và xác nhận ngày cột mốc; xuất dữ liệu JSON; manifest, install/update support, offline fallback; unit tests và Playwright E2E.
