@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode, type KeyboardEventHandler } from "react";
 import { X } from "lucide-react";
 
 type DialogProps = {
@@ -9,6 +9,10 @@ type DialogProps = {
   title: string;
   children: ReactNode;
   wide?: boolean;
+  className?: string;
+  overlayClassName?: string;
+  onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
+  returnFocus?: () => HTMLElement | null;
 };
 
 const focusableSelector =
@@ -20,14 +24,20 @@ export function Dialog({
   title,
   children,
   wide = false,
+  className = "",
+  overlayClassName = "",
+  onKeyDown,
+  returnFocus,
 }: DialogProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef(onClose);
+  const returnFocusRef = useRef(returnFocus);
 
   useEffect(() => {
     closeRef.current = onClose;
-  }, [onClose]);
+    returnFocusRef.current = returnFocus;
+  }, [onClose, returnFocus]);
 
   useEffect(() => {
     if (!open) return;
@@ -89,7 +99,9 @@ export function Dialog({
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = previousOverflow;
-      if (previousFocus instanceof HTMLElement && previousFocus.isConnected)
+      const target = returnFocusRef.current?.();
+      if (target?.isConnected) target.focus({ preventScroll: true });
+      else if (previousFocus instanceof HTMLElement && previousFocus.isConnected)
         previousFocus.focus();
     };
   }, [open]);
@@ -98,7 +110,7 @@ export function Dialog({
 
   return (
     <div
-      className="modal-overlay"
+      className={`modal-overlay ${overlayClassName}`}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -109,7 +121,8 @@ export function Dialog({
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className={`modal-panel${wide ? " modal-wide" : ""}`}
+        onKeyDown={onKeyDown}
+        className={`modal-panel${wide ? " modal-wide" : ""} ${className}`}
       >
         <div className="modal-header">
           <h2 id={titleId} className="modal-title">
