@@ -3,6 +3,7 @@ import { PrivacyControls } from "@/features/auth/privacy-controls";
 import { AuditHistory } from "@/features/auth/audit-history";
 import { NotificationSettings } from "@/features/auth/notification-settings";
 import { AccountMediaManager } from "@/features/media/account-media-manager";
+import { EventPhotoGallery } from "@/features/media/event-photo-gallery";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
@@ -776,7 +777,7 @@ export function TimelineView({ eventsOnly = false, initialPage }: { eventsOnly?:
   );
 }
 export function EventDetailView({ id, initialEvent }: { id: string; initialEvent?: Event }) {
-  const { data, child, openEvent, deleteEvent, ready, mode } = useJourney();
+  const { data, child, openEvent, deleteEvent, ready, mode, mediaEnabled } = useJourney();
   const [confirm, setConfirm] = useState(false);
   const event = data.events.find((e) => e.id === id && e.childId === child.id) ?? initialEvent;
   if (!ready) return <div className="loading-state">Đang mở câu chuyện…</div>;
@@ -794,15 +795,15 @@ export function EventDetailView({ id, initialEvent }: { id: string; initialEvent
       </>
     );
   return (
-    <>
+    <div className="event-detail-page">
       <Link className="text-link back-link" href="/timeline">
         ← Trở về hành trình
       </Link>
-      <PageHeading
-        eyebrow="MỘT MẢNH GHÉP YÊU THƯƠNG"
-        title={event.title}
-        description={`${formatLongDate(event.date)}${event.time ? ` · ${event.time}` : ""}`}
-        action={
+      <header className="event-detail-heading">
+        <EventTypeBadge type={event.type} />
+        <h1>{event.title}</h1>
+        <div className="event-detail-toolbar">
+          <p><CalendarDays size={18} aria-hidden="true" /><time dateTime={event.date}>{formatDate(event.date)}{event.time ? ` · ${event.time}` : ""}</time></p>
           <button
             className="button button-secondary"
             onClick={() => openEvent(event)}
@@ -810,49 +811,45 @@ export function EventDetailView({ id, initialEvent }: { id: string; initialEvent
             <Pencil size={16} />
             Chỉnh sửa
           </button>
-        }
-      />
-      <article className="detail-card">
-        <EventTypeBadge type={event.type} />
-        {event.images.length > 0 && (
-          <div className="detail-photos">
-            {event.images.map((src, i) => (
-              <Image
-                width={800}
-                height={600}
-                unoptimized
-                key={i}
-                src={src}
-                alt={`${event.title} - ảnh ${i + 1}`}
-              />
-            ))}
-          </div>
-        )}
-        <div className="detail-journal">
-          <span className="eyebrow">NHỮNG ĐIỀU MÌNH MUỐN NHỚ</span>
-          <p>
-            {event.description ||
-              "Một khoảnh khắc nhỏ, mang theo thật nhiều yêu thương."}
-          </p>
-          <div className="detail-date">
-            <CalendarDays size={17} />
-            <span>
-              Ngày diễn ra: <strong>{formatDate(event.date)}</strong>
-            </span>
-          </div>
-          <small>
-            Đã lưu lúc{" "}
-            {new Date(event.createdAt).toLocaleString("vi-VN", {
-              timeZone: "Asia/Ho_Chi_Minh",
-            })}
-          </small>
         </div>
-      </article>
-      {mode === "server" && <AccountMediaManager purpose="event" targetId={event.id} images={event.images} />}
-      <button className="delete-event" onClick={() => setConfirm(true)}>
-        <Trash2 size={16} />
-        Xóa sự kiện
-      </button>
+      </header>
+      <div className="event-detail-columns">
+        {mode === "server" && mediaEnabled ? (
+          <AccountMediaManager key={event.id} purpose="event" targetId={event.id} images={event.images} eventTitle={event.title} />
+        ) : (
+          <section className="event-photo-section" aria-label="Ảnh của kỷ niệm">
+            <h2>Ảnh của kỷ niệm{event.images.length ? ` (${event.images.length})` : ""}</h2>
+            {event.images.length ? <EventPhotoGallery key={event.id} images={event.images} title={event.title} /> : (
+              <div className="photo-empty">
+                <Camera size={32} aria-hidden="true" />
+                <strong>Chưa có ảnh cho kỷ niệm này</strong>
+                <span>{mode === "demo" ? "Bạn có thể thêm ảnh khi chỉnh sửa kỷ niệm." : "Ảnh gia đình lưu sẽ xuất hiện tại đây."}</span>
+              </div>
+            )}
+          </section>
+        )}
+        <article className="event-story detail-card">
+          <div className="detail-journal">
+            <h2>Câu chuyện của gia đình</h2>
+            <p>
+              {event.description ||
+                "Một khoảnh khắc nhỏ, mang theo thật nhiều yêu thương."}
+            </p>
+            <small>
+              Đã lưu lúc{" "}
+              {new Date(event.createdAt).toLocaleString("vi-VN", {
+                timeZone: "Asia/Ho_Chi_Minh",
+              })}
+            </small>
+          </div>
+        </article>
+      </div>
+      <div className="event-detail-danger">
+        <button className="delete-event" onClick={() => setConfirm(true)}>
+          <Trash2 size={16} />
+          Xóa sự kiện
+        </button>
+      </div>
       <Dialog
         open={confirm}
         title="Xóa kỷ niệm này?"
@@ -876,7 +873,7 @@ export function EventDetailView({ id, initialEvent }: { id: string; initialEvent
           </button>
         </div>
       </Dialog>
-    </>
+    </div>
   );
 }
 export function OnboardingView() {
