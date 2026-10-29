@@ -9,7 +9,7 @@ Scope: presentation and photo viewing only. Keep event/media handlers, file vali
 - [x] Add a large photo viewer with keyboard/escape, focus restoration and image zoom/scroll for reading portrait documents.
 - [x] Put each existing delete-photo action on its corresponding photo; retain server permission/disabled/error states and file upload behavior.
 - [x] Verify no-image/one/many images, deletion/update, long text, portrait/landscape, 320–1440px, keyboard, reduced motion, demo and server roles/media flows.
-- [ ] Capture after images, record checks, commit task-only changes and open a review PR. No merge/deploy.
+- [x] Capture after images, record checks, commit task-only changes and open [Draft PR #3](https://github.com/phanducquang/Mory/pull/3). No merge/deploy.
 
 ## Audit and design choices
 

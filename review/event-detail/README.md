@@ -1,6 +1,6 @@
 # Chi tiết sự kiện · UI/UX
 
-Nhánh `feature/event-detail-gallery`, từ main `23ca0bf`. [Kế hoạch và audit](PLAN.md). Thay đổi giới hạn ở cách trình bày/xem ảnh; không sửa business, API, schema, phân quyền, giới hạn ảnh, worker hoặc storage.
+Review: [Draft PR #3](https://github.com/phanducquang/Mory/pull/3). Nhánh `feature/event-detail-gallery`, từ main `23ca0bf`. [Kế hoạch và audit](PLAN.md). Thay đổi giới hạn ở cách trình bày/xem ảnh; không sửa business, API, schema, phân quyền, giới hạn ảnh, worker hoặc storage.
 
 ## Đã thay đổi
 
