@@ -208,6 +208,13 @@ test("event upload checks image contents, then create and edit preserve the even
     .getByLabel("Câu chuyện của bạn", { exact: false })
     .fill("Cả nhà cùng lưu một buổi chiều bình yên.");
   await dialog.locator('input[type="file"]').setInputFiles({
+    name: "phone-photo.heic", mimeType: "image/heic", buffer: Buffer.from("unsupported test image"),
+  });
+  await expect(dialog.getByRole("alert")).toContainText("HEIC/HEIF");
+  await expect(dialog.getByRole("img", { name: "Ảnh sự kiện 1" })).toHaveCount(0);
+  await expect(dialog.locator('input[type="file"]')).toHaveValue("");
+  await dialog.locator('input[type="file"]').setInputFiles([]);
+  await dialog.locator('input[type="file"]').setInputFiles({
     name: "spoof.png",
     mimeType: "image/png",
     buffer: Buffer.from("this is not an image"),

@@ -26,7 +26,7 @@ type EventValues = z.infer<typeof eventSchema>;
 
 async function readImage(file: File) {
   if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-    throw new Error("Chỉ chấp nhận ảnh JPG, PNG hoặc WEBP.");
+    throw new Error("Định dạng ảnh chưa được hỗ trợ. Hãy chọn JPG, PNG hoặc WebP. Nếu là ảnh HEIC/HEIF, hãy chuyển sang JPG trước khi tải lên.");
   }
   if (file.size > 2 * 1024 * 1024)
     throw new Error("Mỗi ảnh cần nhỏ hơn hoặc bằng 2 MB.");
@@ -295,7 +295,7 @@ export function EventForm({
             id={`${formId}-images`}
             type="file"
             multiple
-            accept="image/jpeg,image/png,image/webp"
+            accept="image/*"
             disabled={uploading || images.length >= 3}
             aria-describedby={`${formId}-images-help${uploadError ? ` ${formId}-images-error` : ""}`}
             aria-invalid={!!uploadError}

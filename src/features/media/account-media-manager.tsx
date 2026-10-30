@@ -24,10 +24,16 @@ export function AccountMediaManager({ purpose, targetId, images, eventTitle = "K
     } catch (err) { setError(err instanceof Error ? err.message : "Chưa thể lưu ảnh."); }
     finally { setBusy(false); }
   }
-  const fileInput = <input id={inputId} type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={busy || (purpose === "event" && images.length >= 12)} onChange={(event) => {
+  // Hint that this is a photo picker; the browser/OS chooses its UI and fallback.
+  // Keep capture unset so selecting an existing photo remains available.
+  const fileInput = <input id={inputId} type="file" accept="image/*" disabled={busy || (purpose === "event" && images.length >= 12)} onChange={(event) => {
         const file = event.target.files?.[0]; event.target.value = "";
         if (!file) return;
+        setError(""); setMessage("");
         if (!file.size || file.size > 8 * 1024 * 1024) { setError("Chọn ảnh có dung lượng từ 1 byte đến 8 MB."); return; }
+        if (file.type && !["image/jpeg", "image/png", "image/webp", "image/avif"].includes(file.type)) {
+          setError("Định dạng ảnh chưa được hỗ trợ. Hãy chọn JPEG, PNG, WebP hoặc AVIF tĩnh. Nếu là ảnh HEIC/HEIF, hãy chuyển sang JPEG trước khi tải lên."); return;
+        }
         void mutate(`/api/media/${purpose}/${targetId}`, { method: "POST", headers: { "Content-Type": file.type }, body: file });
       }} />;
   const help = <p className="form-help media-help">Chỉ thành viên gia đình được xem. JPEG, PNG, WebP hoặc AVIF tĩnh, tối đa 8 MB/ảnh. Ảnh được tối ưu và bỏ metadata, gồm vị trí GPS.</p>;

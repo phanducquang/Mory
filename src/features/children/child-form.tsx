@@ -57,7 +57,7 @@ type ChildValues = z.infer<typeof childSchema>;
 
 async function readAvatar(file: File) {
   if (!["image/jpeg", "image/png", "image/webp"].includes(file.type))
-    throw new Error("Chỉ chấp nhận ảnh JPG, PNG hoặc WEBP.");
+    throw new Error("Định dạng ảnh chưa được hỗ trợ. Hãy chọn JPG, PNG hoặc WebP. Nếu là ảnh HEIC/HEIF, hãy chuyển sang JPG trước khi tải lên.");
   if (file.size > 2 * 1024 * 1024)
     throw new Error("Ảnh đại diện cần nhỏ hơn hoặc bằng 2 MB.");
   const bytes = new Uint8Array(await file.slice(0, 12).arrayBuffer());
@@ -387,7 +387,7 @@ export function ChildForm({
                 <input
                   id={`${formId}-avatar`}
                   type="file"
-                  accept="image/jpeg,image/png,image/webp"
+                  accept="image/*"
                   disabled={uploading}
                   aria-describedby={`${formId}-avatar-help${uploadError ? ` ${formId}-avatar-error` : ""}`}
                   aria-invalid={!!uploadError}

@@ -7,6 +7,8 @@ import { completeVerification } from "./email-utils";
 
 if (process.env.MORY_INTEGRATION_DATABASE !== "disposable-docker") throw new Error("Use the isolated account runner.");
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+// This test injects network failures with page.route; SW-controlled requests can bypass it.
+test.use({ serviceWorkers: "block" });
 test.afterAll(async () => { await pool.end(); });
 const phase = process.env.MORY_DETAIL_REVIEW_PHASE;
 async function capture(page: Page, name: string) {
@@ -40,11 +42,28 @@ test("event photos keep contextual removal, error recovery, private reads and vi
   await expect(page).toHaveURL(/\/events\/[0-9a-f-]+$/);
   await capture(page, "server-empty");
   const manager = page.getByRole("region", { name: "Ảnh của kỷ niệm", exact: true });
+  const uploads: string[] = [];
+  const recordUpload = (request: import("@playwright/test").Request) => {
+    if (request.method() === "POST" && request.url().includes("/api/media/")) uploads.push(request.url());
+  };
+  page.on("request", recordUpload);
+  for (const mimeType of ["image/heic", "image/gif"]) {
+    await manager.getByLabel("Thêm ảnh", { exact: true }).setInputFiles({
+      name: `unsupported.${mimeType.split("/")[1]}`, mimeType, buffer: Buffer.from("unsupported test image"),
+    });
+    await expect(manager.getByRole("alert")).toContainText("Định dạng ảnh chưa được hỗ trợ");
+    await expect(manager.getByLabel("Thêm ảnh", { exact: true })).toHaveValue("");
+  }
+  expect(uploads).toHaveLength(0);
+  await manager.getByLabel("Thêm ảnh", { exact: true }).setInputFiles([]);
   for (const [index, photo] of (await galleryPhotos()).entries()) {
     await manager.getByLabel("Thêm ảnh", { exact: true }).setInputFiles(photo);
     await expect(page.locator(".detail-photos img")).toHaveCount(index + 1);
     await expect(manager.getByLabel("Thêm ảnh", { exact: true })).toBeEnabled();
   }
+  expect(uploads).toHaveLength(3);
+  page.off("request", recordUpload);
+  await expect(manager.getByRole("alert")).toHaveCount(0);
   for (const width of [390, 1440]) { await page.setViewportSize({ width, height: 900 }); await capture(page, "server-detail"); }
   if (phase === "before") return; // Baseline evidence uses the old UI, not the new interactions.
 
